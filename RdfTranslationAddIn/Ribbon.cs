@@ -8,6 +8,8 @@ using Microsoft.Office.Tools.Ribbon;
 using VDS.RDF.Ontology;
 using VDS.RDF.Parsing;
 using VDS.RDF;
+using Microsoft.Office.Interop.Excel;
+using VDS.RDF.Writing;
 
 namespace RdfTranslationAddIn
 {
@@ -43,7 +45,7 @@ namespace RdfTranslationAddIn
 
             // Show the Dialog.  
             // If the user clicked OK in the dialog and an OWL file was selected, open it.  
-            if (openOntologyFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (openOntologyFileDialog.ShowDialog() == DialogResult.OK)
             {
                 OntologyGraph g = new OntologyGraph();
                 FileLoader.Load(g, openOntologyFileDialog.FileName);
@@ -53,7 +55,7 @@ namespace RdfTranslationAddIn
                 {
                     if (oClass.IsBottomClass && oClass.Resource.NodeType == NodeType.Uri)
                     {
-                        Excel.Worksheet newWorksheet = Globals.ThisAddIn.Application.Worksheets.Add();
+                        Worksheet newWorksheet = Globals.ThisAddIn.Application.Worksheets.Add();
                         
                         UriNode classAsUriNode = (UriNode)oClass.Resource;
                         string classFragment = classAsUriNode.Uri.Fragment.TrimStart('#');
@@ -63,11 +65,15 @@ namespace RdfTranslationAddIn
                         int column = 1;
 
                         // Add column for the IRI identifier
+                        // <IRI> is a special identifier used for this purpose, signaling that a) the IRI shall
+                        // be minted from this column, and b) the subsequent row will contain the OWL class for all minted entities
                         string identifierColumnName = GetExcelColumnName(column);
                         string identifierColumnHeaderCellIdentifier = String.Format("{0}1", identifierColumnName);
-                        Excel.Range identifierColumnHeaderCell = newWorksheet.get_Range(identifierColumnHeaderCellIdentifier);
+                        Range identifierColumnHeaderCell = newWorksheet.get_Range(identifierColumnHeaderCellIdentifier);
                         identifierColumnHeaderCell.Value = "Identifier";
-                        identifierColumnHeaderCell.NoteText("<IRI>");
+                        string identifierNote = "<IRI>";
+                        identifierNote += String.Format("\n<{0}>", classAsUriNode.Uri.ToString());
+                        identifierColumnHeaderCell.NoteText(identifierNote);
                         column++;
 
                         // Iterate through the properties for which this class is in the domain; 
@@ -84,7 +90,7 @@ namespace RdfTranslationAddIn
                                 // numeric and zero-indexed such as "0,0".
                                 string headerColumnName = GetExcelColumnName(column);
                                 string headerCellIdentifier = String.Format("{0}1", headerColumnName);
-                                Excel.Range headerCellRange = newWorksheet.get_Range(headerCellIdentifier);
+                                Range headerCellRange = newWorksheet.get_Range(headerCellIdentifier);
 
                                 // Find and assign label
                                 string propertyLabel;
@@ -99,7 +105,7 @@ namespace RdfTranslationAddIn
                                 }
                                 headerCellRange.Value = propertyLabel;
 
-                                // Assign propery IRI
+                                // Assign property IRI
                                 string noteText = String.Format("<{0}>", propertyAsUriNode.Uri.ToString());
 
                                 // Asign property type hinting
@@ -118,7 +124,6 @@ namespace RdfTranslationAddIn
                                 // Assign note text
                                 // TODO: Split into multiple calls if length > 256 chars
                                 headerCellRange.NoteText(noteText);
-
                                 column++;
                             }
                         }
@@ -127,18 +132,107 @@ namespace RdfTranslationAddIn
             }
         }
 
-        private bool isNamedClass(OntologyClass oClass)
+        private struct HeaderFields
         {
-            if (oClass.Resource.NodeType == NodeType.Uri)
-            {
-                return true;
-            }
-            return false;
+            public Uri propertyIri;
+            public Uri propertyType;
+            public Uri propertyRange;
         }
 
         private void exportRdfButton_Click(object sender, RibbonControlEventArgs e)
         {
+            // Set up save file UI
+            SaveFileDialog saveRdfFileDialog = new SaveFileDialog();
+            saveRdfFileDialog.Filter = "NTriples|*.nt";
+            saveRdfFileDialog.Title = "Save RDF file";
+            if (saveRdfFileDialog.ShowDialog() == DialogResult.OK) {
 
+                // Initiate DotNetRdf Graph
+                IGraph g = new Graph();
+
+                // Used to trim URI:s
+                Char[] trimUrisChars = new Char[] { '<', '>' };
+
+                // Iterate over all worksheets
+                foreach (Worksheet worksheet in Globals.ThisAddIn.Application.Worksheets)
+                {
+                    // Which bits of the sheet are being used
+                    Range usedRange = worksheet.UsedRange;
+                    int lastUsedRow = usedRange.Row + usedRange.Rows.Count - 1;
+                    int lastUsedColumn = usedRange.Column + usedRange.Columns.Count - 1;
+
+                    // Identifier column metadata
+                    int identifierColumn = 0;
+                    // Class name is tentative until identifier column is found
+                    Uri className = new Uri(String.Format("http://example.com/{0}", worksheet.Name));
+                
+                    // Set up lookup table. Note that we use 1-indexing to simplify mapping to/from Excel
+                    // ranges. The 0:th column will thus be empty and should not be adressed.
+                    HeaderFields[] headerLookupTable = new HeaderFields[lastUsedColumn + 1];
+
+                    // Parse the header row.
+                    Range headerRange = worksheet.get_Range("1:1");
+                    foreach (Range headerCell in headerRange.Cells)
+                    {
+                        int column = headerCell.Column;
+
+                        // If there is an embedded note, proceed
+                        if (headerCell.NoteText().Count() > 0)
+                        {
+                            string noteText = headerCell.NoteText();
+                            string[] noteTextComponents = noteText.Split('\n');
+
+                            string iriComponent = noteTextComponents[0];
+                            if (iriComponent.Equals("<IRI>"))
+                            {
+                                // This is the identifier column; update worksheet metadata accordingly
+                                identifierColumn = headerCell.Column;
+                                if (noteTextComponents.Count() > 1)
+                                {
+                                    string classComponent = noteTextComponents[1];
+                                    string classComponentTrimmed = classComponent.Trim(trimUrisChars);
+                                    className = new Uri(classComponentTrimmed);
+                                }
+                            }
+                            else
+                            {
+                                HeaderFields hf = new HeaderFields();
+                                hf.propertyIri = new Uri(iriComponent.Trim(trimUrisChars));
+                                if (noteTextComponents.Count() > 1)
+                                {
+                                    string propertyTypeComponent = noteTextComponents[1];
+                                    hf.propertyType = new Uri(propertyTypeComponent.Trim(trimUrisChars));
+                                }
+                                if (noteTextComponents.Count() > 2)
+                                {
+                                    string propertyRangeComponent = noteTextComponents[2];
+                                    hf.propertyRange = new Uri(propertyRangeComponent.Trim(trimUrisChars));
+                                }
+                                headerLookupTable[column] = hf;
+                            }
+                        }
+                    }
+
+                    // Now, assuming an identifier column has been found, we can finally start parsing the rows
+                    // TODO: Implement this :-)
+                    if (identifierColumn != 0)
+                    {
+                        IUriNode dotNetRDF = g.CreateUriNode(UriFactory.Create("http://www.dotnetrdf.org"));
+                        IUriNode says = g.CreateUriNode(UriFactory.Create("http://example.org/says"));
+                        ILiteralNode helloWorld = g.CreateLiteralNode("Hello World");
+                        ILiteralNode bonjourMonde = g.CreateLiteralNode("Bonjour tout le Monde", "fr");
+
+                        g.Assert(new Triple(dotNetRDF, says, helloWorld));
+                        g.Assert(new Triple(dotNetRDF, says, bonjourMonde));
+
+                        IUriNode worksheetClass = g.CreateUriNode(className);
+                        g.Assert(new Triple(dotNetRDF, g.CreateUriNode(UriFactory.Create(RdfSpecsHelper.RdfType)), worksheetClass));
+
+                        NTriplesWriter ntwriter = new NTriplesWriter();
+                        ntwriter.Save(g, saveRdfFileDialog.FileName);
+                    }
+                }
+            }
         }
     }
 }
