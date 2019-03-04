@@ -250,10 +250,8 @@ namespace RdfTranslationAddIn
                                 INode objectNode;
                                 string cellValue = dataCell.Text;
 
-                                // TODO: Bug, the first branch is always triggered and the second never, so everything is parsed as literals
-                                if (hf.propertyType == new Uri(OntologyHelper.OwlDatatypeProperty))
+                                if (hf.propertyType.ToString().Equals(OntologyHelper.OwlDatatypeProperty))
                                 {
-                                    //string stringRepresentationOfValue = excelObjectToLiteralString(cellValue);
                                     objectNode = g.CreateLiteralNode(cellValue, hf.propertyRange);
                                 }
                                 else
