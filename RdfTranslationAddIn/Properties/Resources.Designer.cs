@@ -63,9 +63,19 @@ namespace RdfTranslationAddIn.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Directed3 {
+        internal static System.Drawing.Bitmap ExportRdfIcon {
             get {
-                object obj = ResourceManager.GetObject("Directed3", resourceCulture);
+                object obj = ResourceManager.GetObject("ExportRdfIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap LoadOntologyIcon {
+            get {
+                object obj = ResourceManager.GetObject("LoadOntologyIcon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
