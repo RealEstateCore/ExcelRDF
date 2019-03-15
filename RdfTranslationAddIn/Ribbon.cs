@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Excel = Microsoft.Office.Interop.Excel;
 using System.Windows.Forms;
 using Microsoft.Office.Tools.Ribbon;
 using VDS.RDF.Ontology;
@@ -10,6 +7,7 @@ using VDS.RDF.Parsing;
 using VDS.RDF;
 using Microsoft.Office.Interop.Excel;
 using VDS.RDF.Writing;
+using System.IO;
 
 namespace RdfTranslationAddIn
 {
@@ -40,8 +38,8 @@ namespace RdfTranslationAddIn
         {
             // Displays an OpenFileDialog so the user can select an ontology.  
             OpenFileDialog openOntologyFileDialog = new OpenFileDialog();
-            openOntologyFileDialog.Filter = "OWL Ontologies|*.owl";
-            openOntologyFileDialog.Title = "Select an OWL ontology file";
+            openOntologyFileDialog.Filter = "RDF/XML (*.rdf)|*.rdf|Turtle (*.ttl)|*.ttl|JSON-LD (*.jsonld)|*.jsonld|NTriples (*.nt)|*.nt|NQuads (*.nq)|*.nq|TriG (*.trig)|*.trig";
+            openOntologyFileDialog.Title = "Select an ontology file";
 
             // Show the Dialog.  
             // If the user clicked OK in the dialog and an OWL file was selected, open it.  
@@ -143,7 +141,7 @@ namespace RdfTranslationAddIn
         {
             // Set up save file UI
             SaveFileDialog saveRdfFileDialog = new SaveFileDialog();
-            saveRdfFileDialog.Filter = "NTriples|*.nt";
+            saveRdfFileDialog.Filter = "RDF/XML (*.rdf)|*.rdf|Turtle (*.ttl)|*.ttl|NTriples (*.nt)|*.nt";
             saveRdfFileDialog.Title = "Save RDF file";
             if (saveRdfFileDialog.ShowDialog() == DialogResult.OK) {
 
@@ -264,9 +262,9 @@ namespace RdfTranslationAddIn
 
                             }
                         }
-
-                        NTriplesWriter ntwriter = new NTriplesWriter();
-                        ntwriter.Save(g, saveRdfFileDialog.FileName);
+                        String saveFileExtension = Path.GetExtension(saveRdfFileDialog.FileName);
+                        IRdfWriter writer = MimeTypesHelper.GetWriterByFileExtension(saveFileExtension);
+                        writer.Save(g, saveRdfFileDialog.FileName);
                     }
                 }
             }
