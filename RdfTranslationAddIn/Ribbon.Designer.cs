@@ -60,6 +60,8 @@
             // 
             // loadOntologyButton
             // 
+            this.loadOntologyButton.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.loadOntologyButton.Image = global::RdfTranslationAddIn.Properties.Resources.Directed3;
             this.loadOntologyButton.Label = "Load Ontology";
             this.loadOntologyButton.Name = "loadOntologyButton";
             this.loadOntologyButton.ShowImage = true;
@@ -67,6 +69,8 @@
             // 
             // exportRdfButton
             // 
+            this.exportRdfButton.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.exportRdfButton.Image = global::RdfTranslationAddIn.Properties.Resources.Directed3;
             this.exportRdfButton.Label = "Export RDF";
             this.exportRdfButton.Name = "exportRdfButton";
             this.exportRdfButton.ShowImage = true;
