@@ -125,6 +125,11 @@ namespace RdfTranslationAddIn
                                 column++;
                             }
                         }
+
+                        // Bold the header row and fit the columns so things look nice
+                        Range headerRow = newWorksheet.get_Range("A1").EntireRow;
+                        headerRow.Font.Bold = true;
+                        headerRow.Columns.AutoFit();
                     }
                 }
             }
