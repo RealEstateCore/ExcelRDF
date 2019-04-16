@@ -144,132 +144,141 @@ namespace RdfTranslationAddIn
 
         private void exportRdfButton_Click(object sender, RibbonControlEventArgs e)
         {
-            // Set up save file UI
-            SaveFileDialog saveRdfFileDialog = new SaveFileDialog();
-            saveRdfFileDialog.Filter = "RDF/XML (*.rdf)|*.rdf|Turtle (*.ttl)|*.ttl|NTriples (*.nt)|*.nt";
-            saveRdfFileDialog.Title = "Save RDF file";
-            if (saveRdfFileDialog.ShowDialog() == DialogResult.OK) {
+            ExportOptionsForm exportOptionsForm = new ExportOptionsForm();
+            if (exportOptionsForm.ShowDialog() == DialogResult.OK)
+            {
+                // Get the Uri set in the dialog
+                Uri exportNamespace = Globals.ThisAddIn.exportNamespace;
 
-                // Initiate DotNetRdf Graph and shared IRI:s
-                IGraph g = new Graph();
-                IUriNode rdfType = g.CreateUriNode(UriFactory.Create(RdfSpecsHelper.RdfType));
-
-                // Used to trim URI:s
-                Char[] trimUrisChars = new Char[] { '<', '>' };
-
-                // Iterate over all worksheets
-                foreach (Worksheet worksheet in Globals.ThisAddIn.Application.Worksheets)
+                // Set up save file UI
+                SaveFileDialog saveRdfFileDialog = new SaveFileDialog();
+                saveRdfFileDialog.Filter = "RDF/XML (*.rdf)|*.rdf|Turtle (*.ttl)|*.ttl|NTriples (*.nt)|*.nt";
+                saveRdfFileDialog.Title = "Save RDF file";
+                if (saveRdfFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    // Which bits of the sheet are being used
-                    Range usedRange = worksheet.UsedRange;
-                    int lastUsedRow = usedRange.Row + usedRange.Rows.Count - 1;
-                    int lastUsedColumn = usedRange.Column + usedRange.Columns.Count - 1;
 
-                    // Identifier column metadata
-                    int identifierColumn = 0;
-                    // Class name is tentative until identifier column is found
-                    Uri className = new Uri(String.Format("http://example.com/{0}", worksheet.Name));
-                
-                    // Set up lookup table. Note that we use 1-indexing to simplify mapping to/from Excel
-                    // ranges. The 0:th column will thus be empty and should not be adressed, as will the
-                    // identifier column.
-                    HeaderFields[] headerLookupTable = new HeaderFields[lastUsedColumn + 1];
+                    // Initiate DotNetRdf Graph and shared IRI:s
+                    IGraph g = new Graph();
+                    IUriNode rdfType = g.CreateUriNode(UriFactory.Create(RdfSpecsHelper.RdfType));
 
-                    // Parse the header row.
-                    Range headerRange = worksheet.get_Range("1:1");
-                    foreach (Range headerCell in headerRange.Cells)
+                    // Used to trim URI:s
+                    Char[] trimUrisChars = new Char[] { '<', '>' };
+
+                    // Iterate over all worksheets
+                    foreach (Worksheet worksheet in Globals.ThisAddIn.Application.Worksheets)
                     {
-                        int column = headerCell.Column;
+                        // Which bits of the sheet are being used
+                        Range usedRange = worksheet.UsedRange;
+                        int lastUsedRow = usedRange.Row + usedRange.Rows.Count - 1;
+                        int lastUsedColumn = usedRange.Column + usedRange.Columns.Count - 1;
 
-                        // If there is an embedded note, proceed
-                        if (headerCell.NoteText().Count() > 0)
+                        // Identifier column metadata
+                        int identifierColumn = 0;
+
+                        // Class name is tentatively in the data namespace until the identifier column is found
+                        Uri className = new Uri(exportNamespace, worksheet.Name);
+
+                        // Set up lookup table. Note that we use 1-indexing to simplify mapping to/from Excel
+                        // ranges. The 0:th column will thus be empty and should not be adressed, as will the
+                        // identifier column.
+                        HeaderFields[] headerLookupTable = new HeaderFields[lastUsedColumn + 1];
+
+                        // Parse the header row.
+                        Range headerRange = worksheet.get_Range("1:1");
+                        foreach (Range headerCell in headerRange.Cells)
                         {
-                            string noteText = headerCell.NoteText();
-                            string[] noteTextComponents = noteText.Split('\n');
+                            int column = headerCell.Column;
 
-                            string iriComponent = noteTextComponents[0];
-                            if (iriComponent.Equals("<IRI>"))
+                            // If there is an embedded note, proceed
+                            if (headerCell.NoteText().Count() > 0)
                             {
-                                // This is the identifier column; update worksheet metadata accordingly
-                                identifierColumn = headerCell.Column;
-                                if (noteTextComponents.Count() > 1)
+                                string noteText = headerCell.NoteText();
+                                string[] noteTextComponents = noteText.Split('\n');
+
+                                string iriComponent = noteTextComponents[0];
+                                if (iriComponent.Equals("<IRI>"))
                                 {
-                                    string classComponent = noteTextComponents[1];
-                                    string classComponentTrimmed = classComponent.Trim(trimUrisChars);
-                                    className = new Uri(classComponentTrimmed);
-                                }
-                            }
-                            else
-                            {
-                                HeaderFields hf = new HeaderFields();
-                                hf.propertyIri = g.CreateUriNode(UriFactory.Create(iriComponent.Trim(trimUrisChars)));
-                                if (noteTextComponents.Count() > 1)
-                                {
-                                    string propertyTypeComponent = noteTextComponents[1];
-                                    hf.propertyType = new Uri(propertyTypeComponent.Trim(trimUrisChars));
-                                }
-                                if (noteTextComponents.Count() > 2)
-                                {
-                                    string propertyRangeComponent = noteTextComponents[2];
-                                    hf.propertyRange = new Uri(propertyRangeComponent.Trim(trimUrisChars));
-                                }
-                                headerLookupTable[column] = hf;
-                            }
-                        }
-                    }
-
-                    // Now, assuming an identifier column has been found, we can finally start parsing the rows
-                    if (identifierColumn != 0)
-                    {
-                        // All entities will have the same class
-                        IUriNode worksheetClass = g.CreateUriNode(className);
-
-                        // For every row in the spreadsheet..
-                        for (int rowIndex = 2; rowIndex <= lastUsedRow; rowIndex++)
-                        {
-                            string rowRangeIdentifier = String.Format("{0}{1}:{2}{3}", GetExcelColumnName(1), rowIndex, GetExcelColumnName(lastUsedColumn), rowIndex);
-                            Range row = worksheet.get_Range(rowRangeIdentifier);
-
-                            // Set subject node ID. TODO Fix this ugly assumption -- need to request the data namespace from user!
-                            string identifierCellIdentifier = String.Format("{0}{1}", GetExcelColumnName(identifierColumn), rowIndex);
-                            Range identifierCell = worksheet.get_Range(identifierCellIdentifier);
-                            string subjectIri = "http://example.org/#" + identifierCell.Text;
-                            IUriNode subjectNode = g.CreateUriNode(UriFactory.Create(subjectIri));
-                            g.Assert(new Triple(subjectNode, rdfType, worksheetClass));
-
-                            // Iterate over remaining columns, i.e., property instances, skipping the identifier column if it reappears
-                            foreach (Range dataCell in row.Cells)
-                            {
-                                if (dataCell.Column == identifierColumn)
-                                {
-                                    continue;
-                                }
-
-                                HeaderFields hf = headerLookupTable[dataCell.Column];
-                                IUriNode predicateNode = hf.propertyIri;
-
-                                // Get out and parse object. 
-                                // "Raw" cell value, will need treatment (TODO!)
-                                INode objectNode;
-                                string cellValue = dataCell.Text;
-
-                                if (hf.propertyType.ToString().Equals(OntologyHelper.OwlDatatypeProperty))
-                                {
-                                    objectNode = g.CreateLiteralNode(cellValue, hf.propertyRange);
+                                    // This is the identifier column; update worksheet metadata accordingly
+                                    identifierColumn = headerCell.Column;
+                                    if (noteTextComponents.Count() > 1)
+                                    {
+                                        string classComponent = noteTextComponents[1];
+                                        string classComponentTrimmed = classComponent.Trim(trimUrisChars);
+                                        className = new Uri(classComponentTrimmed);
+                                    }
                                 }
                                 else
                                 {
-                                    // TODO: MUST FIX example data namespace to get from users
-                                    string objectIri = "http://example.org/#" + cellValue;
-                                    objectNode = g.CreateUriNode(UriFactory.Create(objectIri));
+                                    HeaderFields hf = new HeaderFields();
+                                    hf.propertyIri = g.CreateUriNode(UriFactory.Create(iriComponent.Trim(trimUrisChars)));
+                                    if (noteTextComponents.Count() > 1)
+                                    {
+                                        string propertyTypeComponent = noteTextComponents[1];
+                                        hf.propertyType = new Uri(propertyTypeComponent.Trim(trimUrisChars));
+                                    }
+                                    if (noteTextComponents.Count() > 2)
+                                    {
+                                        string propertyRangeComponent = noteTextComponents[2];
+                                        hf.propertyRange = new Uri(propertyRangeComponent.Trim(trimUrisChars));
+                                    }
+                                    headerLookupTable[column] = hf;
                                 }
-                                g.Assert(new Triple(subjectNode, predicateNode, objectNode));
-
                             }
                         }
-                        String saveFileExtension = Path.GetExtension(saveRdfFileDialog.FileName);
-                        IRdfWriter writer = MimeTypesHelper.GetWriterByFileExtension(saveFileExtension);
-                        writer.Save(g, saveRdfFileDialog.FileName);
+
+                        // Now, assuming an identifier column has been found, we can finally start parsing the rows
+                        if (identifierColumn != 0)
+                        {
+                            // All entities will have the same class
+                            IUriNode worksheetClass = g.CreateUriNode(className);
+
+                            // For every row in the spreadsheet..
+                            for (int rowIndex = 2; rowIndex <= lastUsedRow; rowIndex++)
+                            {
+                                string rowRangeIdentifier = String.Format("{0}{1}:{2}{3}", GetExcelColumnName(1), rowIndex, GetExcelColumnName(lastUsedColumn), rowIndex);
+                                Range row = worksheet.get_Range(rowRangeIdentifier);
+
+                                // Set subject node ID. TODO Fix this ugly assumption -- need to request the data namespace from user!
+                                string identifierCellIdentifier = String.Format("{0}{1}", GetExcelColumnName(identifierColumn), rowIndex);
+                                Range identifierCell = worksheet.get_Range(identifierCellIdentifier);
+                                Uri subjectUri = new Uri(exportNamespace, identifierCell.Text);
+                                IUriNode subjectNode = g.CreateUriNode(subjectUri);
+                                g.Assert(new Triple(subjectNode, rdfType, worksheetClass));
+
+                                // Iterate over remaining columns, i.e., property instances, skipping the identifier column if it reappears
+                                foreach (Range dataCell in row.Cells)
+                                {
+                                    if (dataCell.Column == identifierColumn)
+                                    {
+                                        continue;
+                                    }
+
+                                    HeaderFields hf = headerLookupTable[dataCell.Column];
+                                    IUriNode predicateNode = hf.propertyIri;
+
+                                    // Get out and parse object. 
+                                    // "Raw" cell value, will need treatment (TODO!)
+                                    INode objectNode;
+                                    string cellValue = dataCell.Text;
+
+                                    if (hf.propertyType.ToString().Equals(OntologyHelper.OwlDatatypeProperty))
+                                    {
+                                        objectNode = g.CreateLiteralNode(cellValue, hf.propertyRange);
+                                    }
+                                    else
+                                    {
+                                        // TODO: MUST FIX example data namespace to get from users
+                                        Uri objectUri = new Uri(exportNamespace, cellValue);
+                                        objectNode = g.CreateUriNode(objectUri);
+                                    }
+                                    g.Assert(new Triple(subjectNode, predicateNode, objectNode));
+
+                                }
+                            }
+                            String saveFileExtension = Path.GetExtension(saveRdfFileDialog.FileName);
+                            IRdfWriter writer = MimeTypesHelper.GetWriterByFileExtension(saveFileExtension);
+                            writer.Save(g, saveRdfFileDialog.FileName);
+                        }
                     }
                 }
             }

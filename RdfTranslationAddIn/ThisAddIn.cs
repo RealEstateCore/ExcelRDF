@@ -11,6 +11,8 @@ namespace RdfTranslationAddIn
 {
     public partial class ThisAddIn
     {
+        public Uri exportNamespace;
+
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
         }
