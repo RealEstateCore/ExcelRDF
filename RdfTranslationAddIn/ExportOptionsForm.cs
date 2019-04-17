@@ -41,8 +41,7 @@ namespace RdfTranslationAddIn
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            // TODO: Set this on OK-click instead based on form input.
-            Globals.ThisAddIn.exportNamespace = new Uri("https://test.example.com/");
+            Globals.ThisAddIn.exportNamespace = new Uri(exportNamespaceTextBox.Text);
             this.Close();
         }
 
