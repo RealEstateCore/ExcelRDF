@@ -9,6 +9,7 @@ using Microsoft.Office.Interop.Excel;
 using VDS.RDF.Writing;
 using System.IO;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace RdfTranslationAddIn
 {
@@ -143,8 +144,69 @@ namespace RdfTranslationAddIn
             public Uri propertyRange;
         }
 
+        private Uri ConcatenateAsUri(Uri rootUri, string endFragment)
+        {
+            string combined = string.Format("{0}{1}", rootUri.ToString(), endFragment);
+            return new Uri(combined);
+        }
+
+        HashSet<Uri> getNamespaceUrisFromComments(Range sourceRange)
+        {
+            // Used for filtering spurious hits out later
+            List<string> wellknownNamespaces = new List<String> { NamespaceMapper.OWL, NamespaceMapper.RDF, NamespaceMapper.RDFS, NamespaceMapper.XMLSCHEMA };
+
+            HashSet<Uri> retVal = new HashSet<Uri>();
+            // Iterate through range
+            foreach (Range cell in sourceRange.Cells)
+            {
+                // If there are notes, read them
+                if (cell.NoteText().Count() > 0)
+                {
+                    string noteText = cell.NoteText();
+                    // Parse notes by line
+                    foreach (string noteTextComponent in noteText.Split('\n'))
+                    {
+                        // Trim enclosure and see if we get a URI out
+                        Char[] trimUrisChars = new Char[] { '<', '>' };
+                        if (Uri.TryCreate(noteTextComponent.Trim(trimUrisChars), UriKind.Absolute, out Uri noteTextComponentUri) == true)
+                        {
+                            // Yay, we have a Uri! Now let's figure out which type. Start by removing any query data if it exists
+                            string nameSpaceUri = noteTextComponentUri.GetLeftPart(UriPartial.Path);
+                            if (noteTextComponentUri.Fragment.Equals(""))
+                            {
+                                // There's no fragment, i.e., this is a slash URI; strip everything after the last slash.
+                                nameSpaceUri = nameSpaceUri.Substring(0, nameSpaceUri.LastIndexOf('/') + 1);
+                            }
+                            else
+                            {
+                                // There is a fragment, i.e., this is a hash URI; build the namespace from the
+                                // path and add back the closing hash
+                                nameSpaceUri = nameSpaceUri + "#";
+                            }
+                            // Finally, if the resulting name space URI is not in the default mappings already, add it to the list
+                            if (!wellknownNamespaces.Contains(nameSpaceUri)) {
+                                retVal.Add(new Uri(nameSpaceUri));
+                            }
+                        }
+                    }
+                }
+            }
+            return retVal;
+        }
+
         private void exportRdfButton_Click(object sender, RibbonControlEventArgs e)
         {
+            // Generate candidate list of namespaces to map, for the export dialog to consume
+            HashSet<Uri> candidateNamespaces = new HashSet<Uri>();
+            foreach (Worksheet worksheet in Globals.ThisAddIn.Application.Worksheets)
+            {
+                int lastUsedColumnIndex = worksheet.UsedRange.Columns.Count;
+                string lastUsedColumnName = GetExcelColumnName(lastUsedColumnIndex);
+                Range headerRange = worksheet.get_Range(String.Format("A1:{0}1", lastUsedColumnName));
+                candidateNamespaces.UnionWith(getNamespaceUrisFromComments(headerRange));
+            }
+            Globals.ThisAddIn.candidateNamespacesToMap = candidateNamespaces;
+
             ExportOptionsForm exportOptionsForm = new ExportOptionsForm();
             if (exportOptionsForm.ShowDialog() == DialogResult.OK)
             {
@@ -183,7 +245,7 @@ namespace RdfTranslationAddIn
                         int identifierColumn = 0;
 
                         // Class name is tentatively in the data namespace until the identifier column is found
-                        Uri className = new Uri(exportNamespace, worksheet.Name);
+                        Uri className = ConcatenateAsUri(exportNamespace, worksheet.Name);
 
                         // Set up lookup table. Note that we use 1-indexing to simplify mapping to/from Excel
                         // ranges. The 0:th column will thus be empty and should not be adressed, as will the
@@ -191,7 +253,8 @@ namespace RdfTranslationAddIn
                         HeaderFields[] headerLookupTable = new HeaderFields[lastUsedColumn + 1];
 
                         // Parse the header row.
-                        Range headerRange = worksheet.get_Range("1:1");
+                        string lastUsedColumnName = GetExcelColumnName(lastUsedColumn);
+                        Range headerRange = worksheet.get_Range(String.Format("A1:{0}1", lastUsedColumnName));
                         foreach (Range headerCell in headerRange.Cells)
                         {
                             int column = headerCell.Column;
@@ -248,7 +311,7 @@ namespace RdfTranslationAddIn
                                 // Set subject node ID. 
                                 string identifierCellIdentifier = String.Format("{0}{1}", GetExcelColumnName(identifierColumn), rowIndex);
                                 Range identifierCell = worksheet.get_Range(identifierCellIdentifier);
-                                Uri subjectUri = new Uri(exportNamespace, identifierCell.Text);
+                                Uri subjectUri = ConcatenateAsUri(exportNamespace, identifierCell.Text);
                                 IUriNode subjectNode = g.CreateUriNode(subjectUri);
                                 g.Assert(new Triple(subjectNode, rdfType, worksheetClass));
 
@@ -274,7 +337,7 @@ namespace RdfTranslationAddIn
                                     }
                                     else
                                     {
-                                        Uri objectUri = new Uri(exportNamespace, cellValue);
+                                        Uri objectUri = ConcatenateAsUri(exportNamespace, cellValue);
                                         objectNode = g.CreateUriNode(objectUri);
                                     }
                                     g.Assert(new Triple(subjectNode, predicateNode, objectNode));

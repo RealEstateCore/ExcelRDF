@@ -21,7 +21,14 @@ namespace RdfTranslationAddIn
 
         private void ExportOptionsForm_Load(object sender, EventArgs e)
         {
-
+            int nsIndex = 0;
+            foreach (Uri uri in Globals.ThisAddIn.candidateNamespacesToMap)
+            {
+                string pName = String.Format("ns{0}", nsIndex);
+                nsIndex++;
+                string[] row = { pName, uri.ToString() };
+                namespacePrefixesView.Rows.Add(row);
+            }
         }
 
         private void exportNamespaceTextBox_Validating(object sender, CancelEventArgs e)
@@ -30,13 +37,11 @@ namespace RdfTranslationAddIn
             {
                 errorProvider1.SetError(exportNamespaceTextBox, "");
                 okButton.Enabled = true;
-                e.Cancel = false;
             }
             else
             {
                 errorProvider1.SetError(exportNamespaceTextBox, "Please enter a correctly formatted URI.");
                 okButton.Enabled = false;
-                e.Cancel = true;
             }
         }
 
@@ -69,7 +74,7 @@ namespace RdfTranslationAddIn
 
         private void removePrefixButton_Click(object sender, EventArgs e)
         {
-            if (namespacePrefixesView.SelectedRows.Count > 0 && namespacePrefixesView.SelectedRows[0].Index != namespacePrefixesView.Rows.Count - 1)
+            if (namespacePrefixesView.SelectedRows.Count == 1)
             {
                 namespacePrefixesView.Rows.RemoveAt(namespacePrefixesView.SelectedRows[0].Index);
             }
@@ -88,13 +93,11 @@ namespace RdfTranslationAddIn
                 {
                     errorProvider1.SetError(namespacePrefixesView, "");
                     okButton.Enabled = true;
-                    e.Cancel = false;
                 }
                 else
                 {
                     errorProvider1.SetError(namespacePrefixesView, "Please enter a correctly formatted prefix name.");
                     okButton.Enabled = false;
-                    e.Cancel = true;
                 }
             }
             else if (headerText.Equals("Namespace"))
@@ -104,15 +107,19 @@ namespace RdfTranslationAddIn
                 {
                     errorProvider1.SetError(namespacePrefixesView, "");
                     okButton.Enabled = true;
-                    e.Cancel = false;
                 }
                 else
                 {
                     errorProvider1.SetError(namespacePrefixesView, "Please enter a correctly formatted namespace URI.");
                     okButton.Enabled = false;
-                    e.Cancel = true;
                 }
             }
+        }
+
+        private void addDataNamespaceToMappingsButton_Click(object sender, EventArgs e)
+        {
+            string[] row = { "", exportNamespaceTextBox.Text };
+            namespacePrefixesView.Rows.Add(row);
         }
     }
 }
