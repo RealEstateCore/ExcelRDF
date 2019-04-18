@@ -12,6 +12,7 @@ namespace RdfTranslationAddIn
     public partial class ThisAddIn
     {
         public Uri exportNamespace;
+        public Dictionary<string, Uri> exportPrefixMappings;
 
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {

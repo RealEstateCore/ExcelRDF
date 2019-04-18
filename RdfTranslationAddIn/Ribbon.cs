@@ -8,6 +8,7 @@ using VDS.RDF;
 using Microsoft.Office.Interop.Excel;
 using VDS.RDF.Writing;
 using System.IO;
+using System.Collections.Generic;
 
 namespace RdfTranslationAddIn
 {
@@ -161,6 +162,12 @@ namespace RdfTranslationAddIn
                     IGraph g = new Graph();
                     IUriNode rdfType = g.CreateUriNode(UriFactory.Create(RdfSpecsHelper.RdfType));
 
+                    // Assign namespace mappings from export dialog
+                    foreach (KeyValuePair<string, Uri> entry in Globals.ThisAddIn.exportPrefixMappings)
+                    {
+                        g.NamespaceMap.AddNamespace(entry.Key, entry.Value);
+                    }
+
                     // Used to trim URI:s
                     Char[] trimUrisChars = new Char[] { '<', '>' };
 
@@ -238,7 +245,7 @@ namespace RdfTranslationAddIn
                                 string rowRangeIdentifier = String.Format("{0}{1}:{2}{3}", GetExcelColumnName(1), rowIndex, GetExcelColumnName(lastUsedColumn), rowIndex);
                                 Range row = worksheet.get_Range(rowRangeIdentifier);
 
-                                // Set subject node ID. TODO Fix this ugly assumption -- need to request the data namespace from user!
+                                // Set subject node ID. 
                                 string identifierCellIdentifier = String.Format("{0}{1}", GetExcelColumnName(identifierColumn), rowIndex);
                                 Range identifierCell = worksheet.get_Range(identifierCellIdentifier);
                                 Uri subjectUri = new Uri(exportNamespace, identifierCell.Text);
@@ -267,7 +274,6 @@ namespace RdfTranslationAddIn
                                     }
                                     else
                                     {
-                                        // TODO: MUST FIX example data namespace to get from users
                                         Uri objectUri = new Uri(exportNamespace, cellValue);
                                         objectNode = g.CreateUriNode(objectUri);
                                     }
