@@ -26,17 +26,17 @@ namespace RdfTranslationAddIn
 
         private void exportNamespaceTextBox_Validating(object sender, CancelEventArgs e)
         {
-            if (Uri.TryCreate(exportNamespaceTextBox.Text, UriKind.Absolute, out Uri tempValue) == false)
-            {
-                errorProvider1.SetError(exportNamespaceTextBox, "Please enter a correctly formatted URI.");
-                okButton.Enabled = false;
-                e.Cancel = true;
-            }
-            else
+            if (Uri.TryCreate(exportNamespaceTextBox.Text, UriKind.Absolute, out Uri tempValue) == true)
             {
                 errorProvider1.SetError(exportNamespaceTextBox, "");
                 okButton.Enabled = true;
                 e.Cancel = false;
+            }
+            else
+            {
+                errorProvider1.SetError(exportNamespaceTextBox, "Please enter a correctly formatted URI.");
+                okButton.Enabled = false;
+                e.Cancel = true;
             }
         }
 
@@ -84,15 +84,15 @@ namespace RdfTranslationAddIn
             {
                 // Validate prefix cell
                 Regex rx = new Regex(@"[\w\d]+");
-                if (rx.Match(cellText).Success)
+                if (rx.Match(cellText).Success == true)
                 {
-                    errorProvider1.SetError(namespacePrefixesView, "Please enter a correctly formatted prefix name.");
+                    errorProvider1.SetError(namespacePrefixesView, "");
                     okButton.Enabled = true;
                     e.Cancel = false;
                 }
                 else
                 {
-                    errorProvider1.SetError(namespacePrefixesView, "");
+                    errorProvider1.SetError(namespacePrefixesView, "Please enter a correctly formatted prefix name.");
                     okButton.Enabled = false;
                     e.Cancel = true;
                 }
@@ -100,17 +100,17 @@ namespace RdfTranslationAddIn
             else if (headerText.Equals("Namespace"))
             {
                 // Validate namespace cell
-                if (Uri.TryCreate(cellText, UriKind.Absolute, out Uri tempValue) == false)
-                {
-                    errorProvider1.SetError(namespacePrefixesView, "Please enter a correctly formatted namespace URI.");
-                    okButton.Enabled = false;
-                    e.Cancel = true;
-                }
-                else
+                if (Uri.TryCreate(cellText, UriKind.Absolute, out Uri tempValue) == true)
                 {
                     errorProvider1.SetError(namespacePrefixesView, "");
                     okButton.Enabled = true;
                     e.Cancel = false;
+                }
+                else
+                {
+                    errorProvider1.SetError(namespacePrefixesView, "Please enter a correctly formatted namespace URI.");
+                    okButton.Enabled = false;
+                    e.Cancel = true;
                 }
             }
         }
