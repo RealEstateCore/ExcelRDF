@@ -38,6 +38,7 @@ namespace RdfTranslationAddIn
 
         private void loadOntologyButton_Click(object sender, RibbonControlEventArgs e)
         {
+            
             // Displays an OpenFileDialog so the user can select an ontology.  
             OpenFileDialog openOntologyFileDialog = new OpenFileDialog();
             openOntologyFileDialog.Filter = "RDF/XML (*.rdf)|*.rdf|Turtle (*.ttl)|*.ttl|JSON-LD (*.jsonld)|*.jsonld|NTriples (*.nt)|*.nt|NQuads (*.nq)|*.nq|TriG (*.trig)|*.trig";
@@ -50,88 +51,93 @@ namespace RdfTranslationAddIn
                 OntologyGraph g = new OntologyGraph();
                 FileLoader.Load(g, openOntologyFileDialog.FileName);
 
-                // Iterate through the named bottom classes; generate one worksheet for each (named from URI fragment)
-                foreach (OntologyClass oClass in g.OwlClasses)
+                ImportOptionsForm importOptionsForm = new ImportOptionsForm(g);
+                if (importOptionsForm.ShowDialog() == DialogResult.OK)
                 {
-                    if (oClass.IsBottomClass && oClass.Resource.NodeType == NodeType.Uri)
+
+                    // Iterate through the named bottom classes; generate one worksheet for each (named from URI fragment)
+                    foreach (OntologyClass oClass in g.OwlClasses)
                     {
-                        Worksheet newWorksheet = Globals.ThisAddIn.Application.Worksheets.Add();
-                        
-                        UriNode classAsUriNode = (UriNode)oClass.Resource;
-                        string classFragment = classAsUriNode.Uri.Fragment.TrimStart('#');
-                        newWorksheet.Name = classFragment;
-
-                        // Start iterating from the first column
-                        int column = 1;
-
-                        // Add column for the IRI identifier
-                        // <IRI> is a special identifier used for this purpose, signaling that a) the IRI shall
-                        // be minted from this column, and b) the subsequent row will contain the OWL class for all minted entities
-                        string identifierColumnName = GetExcelColumnName(column);
-                        string identifierColumnHeaderCellIdentifier = String.Format("{0}1", identifierColumnName);
-                        Range identifierColumnHeaderCell = newWorksheet.get_Range(identifierColumnHeaderCellIdentifier);
-                        identifierColumnHeaderCell.Value = "Identifier";
-                        string identifierNote = "<IRI>";
-                        identifierNote += String.Format("\n<{0}>", classAsUriNode.Uri.ToString());
-                        identifierColumnHeaderCell.NoteText(identifierNote);
-                        column++;
-
-                        // Iterate through the properties for which this class is in the domain; 
-                        // generate one column for each property (named from IRI fragment)
-                        // Order the columns by type, with datatype properties coming before object properties, 
-                        // then by string representation
-                        foreach (OntologyProperty oProperty in oClass.IsDomainOf.OrderBy(o => o.Types.First()).OrderBy(o => o.ToString()))
+                        if (oClass.IsBottomClass && oClass.Resource.NodeType == NodeType.Uri)
                         {
-                            if (oProperty.Resource.NodeType == NodeType.Uri)
+                            Worksheet newWorksheet = Globals.ThisAddIn.Application.Worksheets.Add();
+
+                            UriNode classAsUriNode = (UriNode)oClass.Resource;
+                            string classFragment = classAsUriNode.Uri.Fragment.TrimStart('#');
+                            newWorksheet.Name = classFragment;
+
+                            // Start iterating from the first column
+                            int column = 1;
+
+                            // Add column for the IRI identifier
+                            // <IRI> is a special identifier used for this purpose, signaling that a) the IRI shall
+                            // be minted from this column, and b) the subsequent row will contain the OWL class for all minted entities
+                            string identifierColumnName = GetExcelColumnName(column);
+                            string identifierColumnHeaderCellIdentifier = String.Format("{0}1", identifierColumnName);
+                            Range identifierColumnHeaderCell = newWorksheet.get_Range(identifierColumnHeaderCellIdentifier);
+                            identifierColumnHeaderCell.Value = "Identifier";
+                            string identifierNote = "<IRI>";
+                            identifierNote += String.Format("\n<{0}>", classAsUriNode.Uri.ToString());
+                            identifierColumnHeaderCell.NoteText(identifierNote);
+                            column++;
+
+                            // Iterate through the properties for which this class is in the domain; 
+                            // generate one column for each property (named from IRI fragment)
+                            // Order the columns by type, with datatype properties coming before object properties, 
+                            // then by string representation
+                            foreach (OntologyProperty oProperty in oClass.IsDomainOf.OrderBy(o => o.Types.First()).OrderBy(o => o.ToString()))
                             {
-                                UriNode propertyAsUriNode = (UriNode)oProperty.Resource;
-
-                                // This is because Excel uses strange adressing, i.e., "A1" instead of something 
-                                // numeric and zero-indexed such as "0,0".
-                                string headerColumnName = GetExcelColumnName(column);
-                                string headerCellIdentifier = String.Format("{0}1", headerColumnName);
-                                Range headerCellRange = newWorksheet.get_Range(headerCellIdentifier);
-
-                                // Find and assign label
-                                string propertyLabel;
-                                if (oProperty.Label.Count() > 0)
+                                if (oProperty.Resource.NodeType == NodeType.Uri)
                                 {
-                                    ILiteralNode labelNode = oProperty.Label.First();
-                                    propertyLabel = labelNode.Value;
+                                    UriNode propertyAsUriNode = (UriNode)oProperty.Resource;
+
+                                    // This is because Excel uses strange adressing, i.e., "A1" instead of something 
+                                    // numeric and zero-indexed such as "0,0".
+                                    string headerColumnName = GetExcelColumnName(column);
+                                    string headerCellIdentifier = String.Format("{0}1", headerColumnName);
+                                    Range headerCellRange = newWorksheet.get_Range(headerCellIdentifier);
+
+                                    // Find and assign label
+                                    string propertyLabel;
+                                    if (oProperty.Label.Count() > 0)
+                                    {
+                                        ILiteralNode labelNode = oProperty.Label.First();
+                                        propertyLabel = labelNode.Value;
+                                    }
+                                    else
+                                    {
+                                        propertyLabel = propertyAsUriNode.Uri.Fragment.TrimStart('#');
+                                    }
+                                    headerCellRange.Value = propertyLabel;
+
+                                    // Assign property IRI
+                                    string noteText = String.Format("<{0}>", propertyAsUriNode.Uri.ToString());
+
+                                    // Asign property type hinting
+                                    string propertyType = oProperty.Types.First().ToString();
+                                    noteText += String.Format("\n<{0}>", propertyType);
+
+                                    // Assign range hinting IRI (provided simple )
+                                    OntologyClass[] namedRanges = oProperty.Ranges.Where(o => o.Resource.NodeType == NodeType.Uri).ToArray();
+                                    if (namedRanges.Count() > 0)
+                                    {
+                                        UriNode rangeAsUriNode = (UriNode)namedRanges.First().Resource;
+                                        string rangeUri = rangeAsUriNode.Uri.ToString();
+                                        noteText += String.Format("\n<{0}>", rangeUri);
+                                    }
+
+                                    // Assign note text
+                                    // TODO: Split into multiple calls if length > 256 chars
+                                    headerCellRange.NoteText(noteText);
+                                    column++;
                                 }
-                                else
-                                {
-                                    propertyLabel = propertyAsUriNode.Uri.Fragment.TrimStart('#');
-                                }
-                                headerCellRange.Value = propertyLabel;
-
-                                // Assign property IRI
-                                string noteText = String.Format("<{0}>", propertyAsUriNode.Uri.ToString());
-
-                                // Asign property type hinting
-                                string propertyType = oProperty.Types.First().ToString();
-                                noteText += String.Format("\n<{0}>", propertyType);
-
-                                // Assign range hinting IRI (provided simple )
-                                OntologyClass[] namedRanges = oProperty.Ranges.Where(o => o.Resource.NodeType == NodeType.Uri).ToArray();
-                                if (namedRanges.Count() > 0)
-                                {
-                                    UriNode rangeAsUriNode = (UriNode)namedRanges.First().Resource;
-                                    string rangeUri = rangeAsUriNode.Uri.ToString();
-                                    noteText += String.Format("\n<{0}>", rangeUri);
-                                }
-
-                                // Assign note text
-                                // TODO: Split into multiple calls if length > 256 chars
-                                headerCellRange.NoteText(noteText);
-                                column++;
                             }
-                        }
 
-                        // Bold the header row and fit the columns so things look nice
-                        Range headerRow = newWorksheet.get_Range("A1").EntireRow;
-                        headerRow.Font.Bold = true;
-                        headerRow.Columns.AutoFit();
+                            // Bold the header row and fit the columns so things look nice
+                            Range headerRow = newWorksheet.get_Range("A1").EntireRow;
+                            headerRow.Font.Bold = true;
+                            headerRow.Columns.AutoFit();
+                        }
                     }
                 }
             }

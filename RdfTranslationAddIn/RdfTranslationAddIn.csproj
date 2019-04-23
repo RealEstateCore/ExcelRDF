@@ -195,11 +195,20 @@
     <Compile Include="ExportOptionsForm.Designer.cs">
       <DependentUpon>ExportOptionsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ImportOptionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImportOptionsForm.Designer.cs">
+      <DependentUpon>ImportOptionsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
     <EmbeddedResource Include="ExportOptionsForm.resx">
       <DependentUpon>ExportOptionsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImportOptionsForm.resx">
+      <DependentUpon>ImportOptionsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
