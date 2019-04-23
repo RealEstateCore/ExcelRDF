@@ -6,6 +6,7 @@ using System.Xml.Linq;
 using Excel = Microsoft.Office.Interop.Excel;
 using Office = Microsoft.Office.Core;
 using Microsoft.Office.Tools.Excel;
+using VDS.RDF.Ontology;
 
 namespace RdfTranslationAddIn
 {
@@ -14,6 +15,7 @@ namespace RdfTranslationAddIn
         public Uri exportNamespace;
         public HashSet<Uri> candidateNamespacesToMap;
         public Dictionary<string, Uri> exportPrefixMappings;
+        public HashSet<OntologyResource> resourcesToImport;
 
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {

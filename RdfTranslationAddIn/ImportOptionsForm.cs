@@ -14,8 +14,6 @@ namespace RdfTranslationAddIn
 {
     public partial class ImportOptionsForm : Form
     {
-        // TODO: Keep track of what was checked somehow?
-
         private OntologyGraph graph;
         private Dictionary<TreeNode, HashSet<OntologyProperty>> classToPropertyMap = new Dictionary<TreeNode, HashSet<OntologyProperty>>();
 
@@ -31,6 +29,7 @@ namespace RdfTranslationAddIn
             string classLabel = GetLabel(c, "en");
             string classId = c.Resource.ToString();
             TreeNode newNode = nodes.Add(classId, classLabel);
+            newNode.Tag = c;
             classToPropertyMap.Add(newNode, new HashSet<OntologyProperty>());
             foreach (OntologyProperty property in c.IsDomainOf.OrderBy(o => o.Types.First()).OrderBy(o => o.ToString()))
             {
@@ -74,6 +73,7 @@ namespace RdfTranslationAddIn
             propertiesListBox.Items.Clear();
             foreach (OntologyProperty property in classToPropertyMap[e.Node])
             {
+                // TODO: re-check those boxes that were checked previously, i.e. keep state
                 propertiesListBox.Items.Add(property);
             }
             propertiesListBox.EndUpdate();
@@ -89,6 +89,32 @@ namespace RdfTranslationAddIn
                 }
             }
             return ontologyResource.Resource.ToString();
+        }
+
+        // TODO: This crashes, fix!
+        private void ontologyClassesTreeView_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            if (e.Node.Checked)
+            {
+                Globals.ThisAddIn.resourcesToImport.Add((OntologyResource)e.Node.Tag);
+            }
+            else
+            {
+                Globals.ThisAddIn.resourcesToImport.Remove((OntologyResource)e.Node.Tag);
+            }
+        }
+
+        private void propertiesListBox_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            if (e.NewValue == CheckState.Checked)
+            {
+                Globals.ThisAddIn.resourcesToImport.Add((OntologyResource)propertiesListBox.Items[e.Index]);
+            }
+            else
+            {
+                Globals.ThisAddIn.resourcesToImport.Remove((OntologyResource)propertiesListBox.Items[e.Index]);
+            }
+            
         }
     }
 }

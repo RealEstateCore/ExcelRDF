@@ -66,6 +66,7 @@
             this.tableLayoutPanel1.SetRowSpan(this.ontologyClassesTreeView, 2);
             this.ontologyClassesTreeView.Size = new System.Drawing.Size(518, 420);
             this.ontologyClassesTreeView.TabIndex = 2;
+            this.ontologyClassesTreeView.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ontologyClassesTreeView_AfterCheck);
             this.ontologyClassesTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.ontologyClassesTreeView_AfterSelect);
             // 
             // tableLayoutPanel1
@@ -97,6 +98,7 @@
             this.propertiesListBox.Name = "propertiesListBox";
             this.propertiesListBox.Size = new System.Drawing.Size(246, 361);
             this.propertiesListBox.TabIndex = 3;
+            this.propertiesListBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.propertiesListBox_ItemCheck);
             // 
             // ImportOptionsForm
             // 
