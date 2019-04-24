@@ -77,7 +77,7 @@ namespace RdfTranslationAddIn
             {
                 // Re-check those boxes that were checked previously, i.e. keep state
                 bool isChecked = Globals.ThisAddIn.resourcesToImport.Contains(property.ToString());
-                propertiesListBox.Items.Add(property, isChecked);
+                propertiesListBox.Items.Add(new PropertyListItem(property), isChecked);
             }
             propertiesListBox.EndUpdate();
         }
@@ -111,13 +111,51 @@ namespace RdfTranslationAddIn
         {
             if (e.NewValue == CheckState.Checked)
             {
-                Globals.ThisAddIn.resourcesToImport.Add(((OntologyResource)propertiesListBox.Items[e.Index]).ToString());
+                Globals.ThisAddIn.resourcesToImport.Add(((PropertyListItem)propertiesListBox.Items[e.Index]).property.ToString());
             }
             else
             {
-                Globals.ThisAddIn.resourcesToImport.Remove(((OntologyResource)propertiesListBox.Items[e.Index]).ToString());
+                Globals.ThisAddIn.resourcesToImport.Remove(((PropertyListItem)propertiesListBox.Items[e.Index]).property.ToString());
             }
             Debug.Print("resourcesToImport contains: " + Globals.ThisAddIn.resourcesToImport.Count);
+        }
+
+        // Nested class for the property list, to change default string representation
+        private class PropertyListItem
+        {
+            public OntologyProperty property;
+            public PropertyListItem(OntologyProperty property)
+            {
+                this.property = property;
+            }
+            public override string ToString()
+            {
+                string enLabel = "";
+                // Iterate over all property labels
+                foreach (ILiteralNode label in property.Label)
+                {
+                    // If a language-agnostic label is found, return it immediately
+                    if (label.Language == "")
+                    {
+                        return label.Value;
+                    }
+                    // If an english-language label is found, store it for later
+                    if (label.Language == "en")
+                    {
+                        enLabel = label.Value;
+                    }
+                }
+                // Fallback option -- use the English label
+                if (enLabel != "")
+                {
+                    return enLabel;
+                }
+                else
+                {
+                    // Fallback to the fallback option -- use property IRI
+                    return property.ToString();
+                }
+            }
         }
     }
 }
