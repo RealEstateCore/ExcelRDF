@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -21,6 +22,7 @@ namespace RdfTranslationAddIn
         {
             InitializeComponent();
             this.graph = graph;
+            Globals.ThisAddIn.resourcesToImport.Clear();
             InitializeTreeView();
         }
 
@@ -73,8 +75,9 @@ namespace RdfTranslationAddIn
             propertiesListBox.Items.Clear();
             foreach (OntologyProperty property in classToPropertyMap[e.Node])
             {
-                // TODO: re-check those boxes that were checked previously, i.e. keep state
-                propertiesListBox.Items.Add(property);
+                // Re-check those boxes that were checked previously, i.e. keep state
+                bool isChecked = Globals.ThisAddIn.resourcesToImport.Contains(property.ToString());
+                propertiesListBox.Items.Add(property, isChecked);
             }
             propertiesListBox.EndUpdate();
         }
@@ -91,30 +94,30 @@ namespace RdfTranslationAddIn
             return ontologyResource.Resource.ToString();
         }
 
-        // TODO: This crashes, fix!
         private void ontologyClassesTreeView_AfterCheck(object sender, TreeViewEventArgs e)
         {
             if (e.Node.Checked)
             {
-                Globals.ThisAddIn.resourcesToImport.Add((OntologyResource)e.Node.Tag);
+                Globals.ThisAddIn.resourcesToImport.Add(e.Node.Tag.ToString());
             }
             else
             {
-                Globals.ThisAddIn.resourcesToImport.Remove((OntologyResource)e.Node.Tag);
+                Globals.ThisAddIn.resourcesToImport.Remove(e.Node.Tag.ToString());
             }
+            Debug.Print("resourcesToImport contains: " + Globals.ThisAddIn.resourcesToImport.Count);
         }
 
         private void propertiesListBox_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             if (e.NewValue == CheckState.Checked)
             {
-                Globals.ThisAddIn.resourcesToImport.Add((OntologyResource)propertiesListBox.Items[e.Index]);
+                Globals.ThisAddIn.resourcesToImport.Add(((OntologyResource)propertiesListBox.Items[e.Index]).ToString());
             }
             else
             {
-                Globals.ThisAddIn.resourcesToImport.Remove((OntologyResource)propertiesListBox.Items[e.Index]);
+                Globals.ThisAddIn.resourcesToImport.Remove(((OntologyResource)propertiesListBox.Items[e.Index]).ToString());
             }
-            
+            Debug.Print("resourcesToImport contains: " + Globals.ThisAddIn.resourcesToImport.Count);
         }
     }
 }

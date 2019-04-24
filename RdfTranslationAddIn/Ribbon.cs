@@ -58,7 +58,10 @@ namespace RdfTranslationAddIn
                     // Iterate through the named bottom classes; generate one worksheet for each (named from URI fragment)
                     foreach (OntologyClass oClass in g.OwlClasses)
                     {
-                        if (oClass.IsBottomClass && oClass.Resource.NodeType == NodeType.Uri)
+                        Debug.Print("Processing class: " + oClass.ToString());
+                        Debug.Print("Count of resourcesToImport: " + Globals.ThisAddIn.resourcesToImport.Count);
+                        Debug.Print("Class in resources list:" + Globals.ThisAddIn.resourcesToImport.Contains(oClass.ToString()));
+                        if (oClass.Resource.NodeType == NodeType.Uri && Globals.ThisAddIn.resourcesToImport.Contains(oClass.ToString()))
                         {
                             Worksheet newWorksheet = Globals.ThisAddIn.Application.Worksheets.Add();
 
@@ -87,7 +90,7 @@ namespace RdfTranslationAddIn
                             // then by string representation
                             foreach (OntologyProperty oProperty in oClass.IsDomainOf.OrderBy(o => o.Types.First()).OrderBy(o => o.ToString()))
                             {
-                                if (oProperty.Resource.NodeType == NodeType.Uri)
+                                if (oProperty.Resource.NodeType == NodeType.Uri && Globals.ThisAddIn.resourcesToImport.Contains(oProperty.ToString()))
                                 {
                                     UriNode propertyAsUriNode = (UriNode)oProperty.Resource;
 

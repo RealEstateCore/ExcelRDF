@@ -15,7 +15,7 @@ namespace RdfTranslationAddIn
         public Uri exportNamespace;
         public HashSet<Uri> candidateNamespacesToMap;
         public Dictionary<string, Uri> exportPrefixMappings;
-        public HashSet<OntologyResource> resourcesToImport;
+        public HashSet<string> resourcesToImport = new HashSet<string>();
 
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
