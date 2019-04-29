@@ -54,19 +54,15 @@ namespace RdfTranslationAddIn
                 if (importOptionsForm.ShowDialog() == DialogResult.OK)
                 {
 
-                    // Iterate through the named bottom classes; generate one worksheet for each (named from URI fragment)
+                    // Iterate through the named bottom classes; generate one worksheet for each
                     foreach (OntologyClass oClass in g.OwlClasses)
                     {
-                        Debug.Print("Processing class: " + oClass.ToString());
-                        Debug.Print("Count of resourcesToImport: " + Globals.ThisAddIn.resourcesToImport.Count);
-                        Debug.Print("Class in resources list:" + Globals.ThisAddIn.resourcesToImport.Contains(oClass.ToString()));
                         if (oClass.Resource.NodeType == NodeType.Uri && Globals.ThisAddIn.resourcesToImport.Contains(oClass.ToString()))
                         {
                             Worksheet newWorksheet = Globals.ThisAddIn.Application.Worksheets.Add();
 
                             UriNode classAsUriNode = (UriNode)oClass.Resource;
-                            string classFragment = classAsUriNode.Uri.Fragment.TrimStart('#');
-                            newWorksheet.Name = classFragment;
+                            newWorksheet.Name = GetLocalName(classAsUriNode.Uri);
 
                             // Start iterating from the first column
                             int column = 1;
@@ -84,7 +80,7 @@ namespace RdfTranslationAddIn
                             column++;
 
                             // Iterate through the properties for which this class is in the domain; 
-                            // generate one column for each property (named from IRI fragment)
+                            // generate one column for each property (named from label and if that does not exist from IRI)
                             // Order the columns by type, with datatype properties coming before object properties, 
                             // then by string representation
                             foreach (OntologyProperty oProperty in oClass.IsDomainOf.OrderBy(o => o.Types.First()).OrderBy(o => o.ToString()))
@@ -108,7 +104,7 @@ namespace RdfTranslationAddIn
                                     }
                                     else
                                     {
-                                        propertyLabel = propertyAsUriNode.Uri.Fragment.TrimStart('#');
+                                        propertyLabel = GetLocalName(propertyAsUriNode.Uri);
                                     }
                                     headerCellRange.Value = propertyLabel;
 
@@ -200,6 +196,21 @@ namespace RdfTranslationAddIn
                 }
             }
             return retVal;
+        }
+
+        private string GetLocalName(Uri uri)
+        {
+            if (uri.Fragment.Equals(""))
+            {
+                // There's no fragment, i.e., this is a slash URI; return substring after the last slash.
+                string uriString = uri.ToString();
+                return uriString.Substring(uriString.LastIndexOf("/") + 1);
+            }
+            else
+            {
+                // There is a fragment, i.e., this is a hash URI; so return the fragment (minus hash) as local name.
+                return uri.Fragment.TrimStart('#');
+            }
         }
 
         private void exportRdfButton_Click(object sender, RibbonControlEventArgs e)
