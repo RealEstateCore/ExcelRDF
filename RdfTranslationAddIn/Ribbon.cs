@@ -350,16 +350,21 @@ namespace RdfTranslationAddIn
                                     INode objectNode;
                                     string cellValue = dataCell.Text;
 
-                                    if (hf.propertyType.ToString().Equals(OntologyHelper.OwlDatatypeProperty))
+                                    // Check so cell isn't empty
+                                    if (!cellValue.Equals(""))
                                     {
-                                        objectNode = g.CreateLiteralNode(cellValue, hf.propertyRange);
+
+                                        if (hf.propertyType.ToString().Equals(OntologyHelper.OwlDatatypeProperty))
+                                        {
+                                            objectNode = g.CreateLiteralNode(cellValue, hf.propertyRange);
+                                        }
+                                        else
+                                        {
+                                            Uri objectUri = ConcatenateAsUri(exportNamespace, cellValue);
+                                            objectNode = g.CreateUriNode(objectUri);
+                                        }
+                                        g.Assert(new Triple(subjectNode, predicateNode, objectNode));
                                     }
-                                    else
-                                    {
-                                        Uri objectUri = ConcatenateAsUri(exportNamespace, cellValue);
-                                        objectNode = g.CreateUriNode(objectUri);
-                                    }
-                                    g.Assert(new Triple(subjectNode, predicateNode, objectNode));
 
                                 }
                             }
