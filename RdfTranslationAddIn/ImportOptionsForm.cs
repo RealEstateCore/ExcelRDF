@@ -22,7 +22,7 @@ namespace RdfTranslationAddIn
         {
             InitializeComponent();
             this.graph = graph;
-            Globals.ThisAddIn.resourcesToImport.Clear();
+            RdfOntologyOperations.instance.resourcesToImport.Clear();
             InitializeTreeView();
         }
 
@@ -33,7 +33,7 @@ namespace RdfTranslationAddIn
         /// <param name="nodes">The collection of nodes to which this class is to be added.</param>
         private void AddToTreeView(OntologyClass c, TreeNodeCollection nodes)
         {
-            string classLabel = GetLabel(c);
+            string classLabel = Helper.GetLabel(c);
             string classId = c.Resource.ToString();
             TreeNode newNode = nodes.Add(classId, classLabel);
             newNode.Tag = c;
@@ -91,79 +91,34 @@ namespace RdfTranslationAddIn
             foreach (OntologyProperty property in classToPropertyMap[e.Node])
             {
                 // Re-check those boxes that were checked previously, i.e. keep state
-                bool isChecked = Globals.ThisAddIn.resourcesToImport.Contains(property.ToString());
+                bool isChecked = RdfOntologyOperations.instance.resourcesToImport.Contains(property.ToString());
                 propertiesListBox.Items.Add(new PropertyListItem(property), isChecked);
             }
             propertiesListBox.EndUpdate();
-        }
-
-        /// <summary>
-        ///  Get a label for an ontology resource, if it exists; else get the full URI.
-        /// </summary>
-        /// <param name="ontologyResource"></param>
-        /// <returns></returns>
-        private static string GetLabel(OntologyResource ontologyResource)
-        {
-            string enLabel = "";
-            // Iterate over all resource labels
-            foreach (ILiteralNode label in ontologyResource.Label)
-            {
-                // If a language-agnostic label is found, return it immediately
-                if (label.Language == "")
-                {
-                    return label.Value;
-                }
-                // If an english-language label is found, store it for later
-                if (label.Language == "en")
-                {
-                    enLabel = label.Value;
-                }
-            }
-            // Fallback option -- use the English label
-            if (enLabel != "")
-            {
-                return enLabel;
-            }
-            else
-            {
-                // Fallback to the fallback option -- use resource IRI, either by extracting local name 
-                // (if it is a URI node) or using whatever representation the resource provides
-                if (ontologyResource.Resource.NodeType == NodeType.Uri)
-                {
-                    IUriNode uriNode = (IUriNode)ontologyResource.Resource;
-                    return ThisAddIn.GetLocalName(uriNode.Uri);
-                }
-                else
-                {
-                    return ontologyResource.ToString();
-                }
-            }
         }
 
         private void ontologyClassesTreeView_AfterCheck(object sender, TreeViewEventArgs e)
         {
             if (e.Node.Checked)
             {
-                Globals.ThisAddIn.resourcesToImport.Add(e.Node.Tag.ToString());
+                RdfOntologyOperations.instance.resourcesToImport.Add(e.Node.Tag.ToString());
             }
             else
             {
-                Globals.ThisAddIn.resourcesToImport.Remove(e.Node.Tag.ToString());
+                RdfOntologyOperations.instance.resourcesToImport.Remove(e.Node.Tag.ToString());
             }
-            Debug.Print("resourcesToImport contains: " + Globals.ThisAddIn.resourcesToImport.Count);
         }
 
         private void propertiesListBox_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             if (e.NewValue == CheckState.Checked)
             {
-                Globals.ThisAddIn.resourcesToImport.Add(((PropertyListItem)propertiesListBox.Items[e.Index]).property.ToString());
+                RdfOntologyOperations.instance.resourcesToImport.Add(((PropertyListItem)propertiesListBox.Items[e.Index]).property.ToString());
             }
             else
             {
-                Globals.ThisAddIn.resourcesToImport.Remove(((PropertyListItem)propertiesListBox.Items[e.Index]).property.ToString());
+                RdfOntologyOperations.instance.resourcesToImport.Remove(((PropertyListItem)propertiesListBox.Items[e.Index]).property.ToString());
             }
-            Debug.Print("resourcesToImport contains: " + Globals.ThisAddIn.resourcesToImport.Count);
         }
 
         /// <summary>
@@ -179,7 +134,7 @@ namespace RdfTranslationAddIn
             }
             public override string ToString()
             {
-                return GetLabel(property);
+                return Helper.GetLabel(property);
             }
         }
     }

@@ -17,7 +17,7 @@ namespace RdfTranslationAddIn
         private void ExportOptionsForm_Load(object sender, EventArgs e)
         {
             int nsIndex = 0;
-            foreach (Uri uri in Globals.ThisAddIn.candidateNamespacesToMap)
+            foreach (Uri uri in RdfOntologyOperations.instance.candidateNamespacesToMap)
             {
                 string pName = String.Format("ns{0}", nsIndex);
                 nsIndex++;
@@ -42,7 +42,7 @@ namespace RdfTranslationAddIn
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            Globals.ThisAddIn.exportNamespace = new Uri(exportNamespaceTextBox.Text);
+            RdfOntologyOperations.instance.exportNamespace = new Uri(exportNamespaceTextBox.Text);
 
             Dictionary<string, Uri> prefixMappings = new Dictionary<string, Uri>();
             foreach (DataGridViewRow row in namespacePrefixesView.Rows)
@@ -52,7 +52,7 @@ namespace RdfTranslationAddIn
                 Uri nspaceUri = new Uri(nspace);
                 prefixMappings.Add(prefix, nspaceUri);
             }
-            Globals.ThisAddIn.exportPrefixMappings = prefixMappings;
+            RdfOntologyOperations.instance.exportPrefixMappings = prefixMappings;
 
             this.Close();
         }

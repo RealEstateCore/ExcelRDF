@@ -195,6 +195,7 @@
     <Compile Include="ExportOptionsForm.Designer.cs">
       <DependentUpon>ExportOptionsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helper.cs" />
     <Compile Include="ImportOptionsForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -232,6 +233,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="RdfOntologyOperations.cs" />
     <Compile Include="Ribbon.cs">
       <SubType>Component</SubType>
     </Compile>

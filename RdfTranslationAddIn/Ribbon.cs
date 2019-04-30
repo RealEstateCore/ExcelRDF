@@ -11,12 +11,12 @@ namespace RdfTranslationAddIn
 
         private void loadOntologyButton_Click(object sender, RibbonControlEventArgs e)
         {
-            Globals.ThisAddIn.LoadOntology();
+            RdfOntologyOperations.instance.LoadOntology();
         }
 
         private void exportRdfButton_Click(object sender, RibbonControlEventArgs e)
         {
-            Globals.ThisAddIn.ExportRDF();
+            RdfOntologyOperations.instance.ExportRDF();
         }
     }
 }
