@@ -126,8 +126,17 @@ namespace RdfTranslationAddIn
             }
             else
             {
-                // Fallback to the fallback option -- use resource IRI
-                return ontologyResource.ToString();
+                // Fallback to the fallback option -- use resource IRI, either by extracting local name 
+                // (if it is a URI node) or using whatever representation the resource provides
+                if (ontologyResource.Resource.NodeType == NodeType.Uri)
+                {
+                    IUriNode uriNode = (IUriNode)ontologyResource.Resource;
+                    return ThisAddIn.GetLocalName(uriNode.Uri);
+                }
+                else
+                {
+                    return ontologyResource.ToString();
+                }
             }
         }
 
