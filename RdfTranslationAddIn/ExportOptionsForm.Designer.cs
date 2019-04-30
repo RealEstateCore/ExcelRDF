@@ -70,7 +70,7 @@
             this.okButton.TabIndex = 0;
             this.okButton.Text = "OK";
             this.okButton.UseVisualStyleBackColor = true;
-            this.okButton.Click += new System.EventHandler(this.okButton_Click);
+            this.okButton.Click += new System.EventHandler(this.OkButton_Click);
             // 
             // cancelButton
             // 
@@ -85,7 +85,7 @@
             this.cancelButton.TabIndex = 1;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
-            this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
+            this.cancelButton.Click += new System.EventHandler(this.CancelButton_Click);
             // 
             // outerLayoutPanel
             // 
@@ -159,7 +159,7 @@
             this.exportNamespaceTextBox.Size = new System.Drawing.Size(723, 31);
             this.exportNamespaceTextBox.TabIndex = 1;
             this.exportNamespaceTextBox.Text = "https://example.com/test#";
-            this.exportNamespaceTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.exportNamespaceTextBox_Validating);
+            this.exportNamespaceTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.ExportNamespaceTextBox_Validating);
             // 
             // addDataNamespaceToMappingsButton
             // 
@@ -173,7 +173,7 @@
             this.addDataNamespaceToMappingsButton.TabIndex = 7;
             this.addDataNamespaceToMappingsButton.Text = "Add prefix";
             this.addDataNamespaceToMappingsButton.UseVisualStyleBackColor = true;
-            this.addDataNamespaceToMappingsButton.Click += new System.EventHandler(this.addDataNamespaceToMappingsButton_Click);
+            this.addDataNamespaceToMappingsButton.Click += new System.EventHandler(this.AddDataNamespaceToMappingsButton_Click);
             // 
             // namespacePrefixesLabel
             // 
@@ -246,7 +246,7 @@
             this.namespacePrefixesView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.namespacePrefixesView.Size = new System.Drawing.Size(822, 445);
             this.namespacePrefixesView.TabIndex = 6;
-            this.namespacePrefixesView.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.namespacePrefixesView_CellValidating);
+            this.namespacePrefixesView.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.NamespacePrefixesView_CellValidating);
             // 
             // prefix
             // 
@@ -292,7 +292,7 @@
             this.removePrefixButton.TabIndex = 5;
             this.removePrefixButton.Text = "Remove";
             this.removePrefixButton.UseVisualStyleBackColor = true;
-            this.removePrefixButton.Click += new System.EventHandler(this.removePrefixButton_Click);
+            this.removePrefixButton.Click += new System.EventHandler(this.RemovePrefixButton_Click);
             // 
             // addPrefixButton
             // 
@@ -306,7 +306,7 @@
             this.addPrefixButton.TabIndex = 4;
             this.addPrefixButton.Text = "Add";
             this.addPrefixButton.UseVisualStyleBackColor = true;
-            this.addPrefixButton.Click += new System.EventHandler(this.addPrefixButton_Click);
+            this.addPrefixButton.Click += new System.EventHandler(this.AddPrefixButton_Click);
             // 
             // tableLayoutPanel1
             // 

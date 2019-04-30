@@ -60,7 +60,7 @@
             this.okButton.TabIndex = 0;
             this.okButton.Text = "OK";
             this.okButton.UseVisualStyleBackColor = true;
-            this.okButton.Click += new System.EventHandler(this.okButton_Click);
+            this.okButton.Click += new System.EventHandler(this.OkButton_Click);
             // 
             // cancelButton
             // 
@@ -75,7 +75,7 @@
             this.cancelButton.TabIndex = 1;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
-            this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
+            this.cancelButton.Click += new System.EventHandler(this.CancelButton_Click);
             // 
             // ontologyClassesTreeView
             // 
@@ -88,8 +88,8 @@
             this.ontologyClassesTreeView.Name = "ontologyClassesTreeView";
             this.ontologyClassesTreeView.Size = new System.Drawing.Size(446, 543);
             this.ontologyClassesTreeView.TabIndex = 2;
-            this.ontologyClassesTreeView.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ontologyClassesTreeView_AfterCheck);
-            this.ontologyClassesTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.ontologyClassesTreeView_AfterSelect);
+            this.ontologyClassesTreeView.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.OntologyClassesTreeView_AfterCheck);
+            this.ontologyClassesTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.OntologyClassesTreeView_AfterSelect);
             // 
             // propertiesListBox
             // 
@@ -104,7 +104,7 @@
             this.propertiesListBox.ScrollAlwaysVisible = true;
             this.propertiesListBox.Size = new System.Drawing.Size(475, 539);
             this.propertiesListBox.TabIndex = 3;
-            this.propertiesListBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.propertiesListBox_ItemCheck);
+            this.propertiesListBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.PropertiesListBox_ItemCheck);
             // 
             // importedClassesLabel
             // 

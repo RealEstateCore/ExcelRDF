@@ -65,7 +65,7 @@
             this.loadOntologyButton.Label = "Load Ontology";
             this.loadOntologyButton.Name = "loadOntologyButton";
             this.loadOntologyButton.ShowImage = true;
-            this.loadOntologyButton.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.loadOntologyButton_Click);
+            this.loadOntologyButton.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.LoadOntologyButton_Click);
             // 
             // exportRdfButton
             // 
@@ -74,7 +74,7 @@
             this.exportRdfButton.Label = "Export RDF";
             this.exportRdfButton.Name = "exportRdfButton";
             this.exportRdfButton.ShowImage = true;
-            this.exportRdfButton.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.exportRdfButton_Click);
+            this.exportRdfButton.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.ExportRdfButton_Click);
             // 
             // Ribbon
             // 

@@ -37,8 +37,9 @@ namespace RdfTranslationAddIn
             public Uri propertyRange;
         }
 
-
-
+        /// <summary>
+        /// Launch the RDF export wizard and save resulting RDF file to disk.
+        /// </summary>
         public void ExportRDF()
         {
             // Generate candidate list of namespaces to map, for the export dialog to consume
@@ -199,6 +200,9 @@ namespace RdfTranslationAddIn
             }
         }
 
+        /// <summary>
+        /// Launch the ontology import wizard and generate an Excel skeleton from the ontology.
+        /// </summary>
         public void LoadOntology()
         {
             // Displays an OpenFileDialog so the user can select an ontology.  

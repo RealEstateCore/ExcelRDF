@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
-using VDS.RDF;
 using VDS.RDF.Ontology;
 
 namespace RdfTranslationAddIn
@@ -68,12 +66,12 @@ namespace RdfTranslationAddIn
             ontologyClassesTreeView.ExpandAll();
         }
 
-        private void okButton_Click(object sender, EventArgs e)
+        private void OkButton_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
-        private void cancelButton_Click(object sender, EventArgs e)
+        private void CancelButton_Click(object sender, EventArgs e)
         {
             this.Close();
         }
@@ -84,7 +82,7 @@ namespace RdfTranslationAddIn
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ontologyClassesTreeView_AfterSelect(object sender, TreeViewEventArgs e)
+        private void OntologyClassesTreeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             propertiesListBox.BeginUpdate();
             propertiesListBox.Items.Clear();
@@ -97,7 +95,7 @@ namespace RdfTranslationAddIn
             propertiesListBox.EndUpdate();
         }
 
-        private void ontologyClassesTreeView_AfterCheck(object sender, TreeViewEventArgs e)
+        private void OntologyClassesTreeView_AfterCheck(object sender, TreeViewEventArgs e)
         {
             if (e.Node.Checked)
             {
@@ -109,7 +107,7 @@ namespace RdfTranslationAddIn
             }
         }
 
-        private void propertiesListBox_ItemCheck(object sender, ItemCheckEventArgs e)
+        private void PropertiesListBox_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             if (e.NewValue == CheckState.Checked)
             {

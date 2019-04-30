@@ -26,7 +26,7 @@ namespace RdfTranslationAddIn
             }
         }
 
-        private void exportNamespaceTextBox_Validating(object sender, CancelEventArgs e)
+        private void ExportNamespaceTextBox_Validating(object sender, CancelEventArgs e)
         {
             if (Uri.TryCreate(exportNamespaceTextBox.Text, UriKind.Absolute, out Uri tempValue) == true)
             {
@@ -40,7 +40,7 @@ namespace RdfTranslationAddIn
             }
         }
 
-        private void okButton_Click(object sender, EventArgs e)
+        private void OkButton_Click(object sender, EventArgs e)
         {
             RdfOntologyOperations.instance.exportNamespace = new Uri(exportNamespaceTextBox.Text);
 
@@ -57,17 +57,17 @@ namespace RdfTranslationAddIn
             this.Close();
         }
 
-        private void cancelButton_Click(object sender, EventArgs e)
+        private void CancelButton_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
-        private void addPrefixButton_Click(object sender, EventArgs e)
+        private void AddPrefixButton_Click(object sender, EventArgs e)
         {
             namespacePrefixesView.Rows.Add();
         }
 
-        private void removePrefixButton_Click(object sender, EventArgs e)
+        private void RemovePrefixButton_Click(object sender, EventArgs e)
         {
             if (namespacePrefixesView.SelectedRows.Count == 1)
             {
@@ -75,7 +75,7 @@ namespace RdfTranslationAddIn
             }
         }
 
-        private void namespacePrefixesView_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
+        private void NamespacePrefixesView_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
         {
             string headerText = namespacePrefixesView.Columns[e.ColumnIndex].HeaderText;
             string cellText = e.FormattedValue.ToString();
@@ -111,7 +111,7 @@ namespace RdfTranslationAddIn
             }
         }
 
-        private void addDataNamespaceToMappingsButton_Click(object sender, EventArgs e)
+        private void AddDataNamespaceToMappingsButton_Click(object sender, EventArgs e)
         {
             string[] row = { "", exportNamespaceTextBox.Text };
             namespacePrefixesView.Rows.Add(row);

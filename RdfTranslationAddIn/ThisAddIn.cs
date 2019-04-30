@@ -1,15 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using InteropExcel = Microsoft.Office.Interop.Excel;
-using VDS.RDF.Ontology;
-using Microsoft.Office.Interop.Excel;
-using VDS.RDF;
-using System.Windows.Forms;
-using VDS.RDF.Parsing;
-using System.IO;
-
-namespace RdfTranslationAddIn
+﻿namespace RdfTranslationAddIn
 {
     public partial class ThisAddIn
     {
