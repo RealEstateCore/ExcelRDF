@@ -14,6 +14,10 @@ namespace RdfTranslationAddIn
         private OntologyGraph graph;
         private Dictionary<TreeNode, HashSet<OntologyProperty>> classToPropertyMap = new Dictionary<TreeNode, HashSet<OntologyProperty>>();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="graph"></param>
         public ImportOptionsForm(OntologyGraph graph)
         {
             InitializeComponent();
@@ -22,9 +26,14 @@ namespace RdfTranslationAddIn
             InitializeTreeView();
         }
 
+        /// <summary>
+        /// Recursively add an ontology class and its subclasses to a tree.
+        /// </summary>
+        /// <param name="c">Ontology class to add.</param>
+        /// <param name="nodes">The collection of nodes to which this class is to be added.</param>
         private void AddToTreeView(OntologyClass c, TreeNodeCollection nodes)
         {
-            string classLabel = GetLabel(c, "en");
+            string classLabel = GetLabel(c);
             string classId = c.Resource.ToString();
             TreeNode newNode = nodes.Add(classId, classLabel);
             newNode.Tag = c;
@@ -41,6 +50,10 @@ namespace RdfTranslationAddIn
             }
         }
 
+        /// <summary>
+        /// Render the class hierarchy of the loaded ontology into the TreeView on the left
+        /// side of the import options window.
+        /// </summary>
         private void InitializeTreeView()
         {
             ontologyClassesTreeView.BeginUpdate();
@@ -65,6 +78,12 @@ namespace RdfTranslationAddIn
             this.Close();
         }
 
+        /// <summary>
+        /// Callback that re-renders the CheckedListBox holding properties when a node in
+        /// in the left-hand TreeView is selected or checked.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ontologyClassesTreeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             propertiesListBox.BeginUpdate();
@@ -78,16 +97,38 @@ namespace RdfTranslationAddIn
             propertiesListBox.EndUpdate();
         }
 
-        private static string GetLabel(OntologyResource ontologyResource, string language)
+        /// <summary>
+        ///  Get a label for an ontology resource, if it exists; else get the full URI.
+        /// </summary>
+        /// <param name="ontologyResource"></param>
+        /// <returns></returns>
+        private static string GetLabel(OntologyResource ontologyResource)
         {
+            string enLabel = "";
+            // Iterate over all resource labels
             foreach (ILiteralNode label in ontologyResource.Label)
             {
-                if (label.Language == language)
+                // If a language-agnostic label is found, return it immediately
+                if (label.Language == "")
                 {
                     return label.Value;
                 }
+                // If an english-language label is found, store it for later
+                if (label.Language == "en")
+                {
+                    enLabel = label.Value;
+                }
             }
-            return ontologyResource.Resource.ToString();
+            // Fallback option -- use the English label
+            if (enLabel != "")
+            {
+                return enLabel;
+            }
+            else
+            {
+                // Fallback to the fallback option -- use resource IRI
+                return ontologyResource.ToString();
+            }
         }
 
         private void ontologyClassesTreeView_AfterCheck(object sender, TreeViewEventArgs e)
@@ -116,7 +157,10 @@ namespace RdfTranslationAddIn
             Debug.Print("resourcesToImport contains: " + Globals.ThisAddIn.resourcesToImport.Count);
         }
 
-        // Nested class for the property list, to change default string representation
+        /// <summary>
+        /// Nested class for the property list, wrapping an OntologyProperty but changing its default
+        /// default string representation to use the label. 
+        /// </summary>
         private class PropertyListItem
         {
             public OntologyProperty property;
@@ -126,31 +170,7 @@ namespace RdfTranslationAddIn
             }
             public override string ToString()
             {
-                string enLabel = "";
-                // Iterate over all property labels
-                foreach (ILiteralNode label in property.Label)
-                {
-                    // If a language-agnostic label is found, return it immediately
-                    if (label.Language == "")
-                    {
-                        return label.Value;
-                    }
-                    // If an english-language label is found, store it for later
-                    if (label.Language == "en")
-                    {
-                        enLabel = label.Value;
-                    }
-                }
-                // Fallback option -- use the English label
-                if (enLabel != "")
-                {
-                    return enLabel;
-                }
-                else
-                {
-                    // Fallback to the fallback option -- use property IRI
-                    return property.ToString();
-                }
+                return GetLabel(property);
             }
         }
     }

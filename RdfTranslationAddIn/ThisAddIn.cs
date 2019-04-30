@@ -49,7 +49,7 @@ namespace RdfTranslationAddIn
             public Uri propertyRange;
         }
 
-        private string GetLocalName(Uri uri)
+        public static string GetLocalName(Uri uri)
         {
             if (uri.Fragment.Equals(""))
             {
