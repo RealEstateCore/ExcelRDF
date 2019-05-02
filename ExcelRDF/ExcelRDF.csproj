@@ -33,7 +33,7 @@
     <PublishUrl>C:\Users\karlh\Scratch\Git\ExcelRDF\docs\distribution\</PublishUrl>
     <InstallUrl>https://karlhammar.com/ExcelRDF/distribution/</InstallUrl>
     <TargetCulture>en</TargetCulture>
-    <ApplicationVersion>1.0.0.1</ApplicationVersion>
+    <ApplicationVersion>1.0.0.0</ApplicationVersion>
     <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateInterval>7</UpdateInterval>
@@ -269,10 +269,11 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>ExcelRDF_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>
+    </ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>BCF1E24059FFB758F955A57F5D511DF4B6899CA2</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>4369197BEBD4FD3999E48B3DCB7F393625DE5BF2</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
