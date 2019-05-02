@@ -5,7 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using VDS.RDF.Ontology;
 
-namespace RdfTranslationAddIn
+namespace ExcelRDF
 {
     public partial class ImportOptionsForm : Form
     {

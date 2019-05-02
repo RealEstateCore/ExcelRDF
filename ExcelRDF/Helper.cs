@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using VDS.RDF;
 using VDS.RDF.Ontology;
 
-namespace RdfTranslationAddIn
+namespace ExcelRDF
 {
     internal static class Helper
     {

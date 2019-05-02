@@ -1,6 +1,6 @@
 ﻿using Microsoft.Office.Tools.Ribbon;
 
-namespace RdfTranslationAddIn
+namespace ExcelRDF
 {
     public partial class Ribbon
     {

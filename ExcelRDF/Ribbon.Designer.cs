@@ -1,4 +1,4 @@
-﻿namespace RdfTranslationAddIn
+﻿namespace ExcelRDF
 {
     partial class Ribbon : Microsoft.Office.Tools.Ribbon.RibbonBase
     {
@@ -61,7 +61,7 @@
             // loadOntologyButton
             // 
             this.loadOntologyButton.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-            this.loadOntologyButton.Image = global::RdfTranslationAddIn.Properties.Resources.LoadOntologyIcon;
+            this.loadOntologyButton.Image = global::ExcelRDF.Properties.Resources.LoadOntologyIcon;
             this.loadOntologyButton.Label = "Load Ontology";
             this.loadOntologyButton.Name = "loadOntologyButton";
             this.loadOntologyButton.ShowImage = true;
@@ -70,7 +70,7 @@
             // exportRdfButton
             // 
             this.exportRdfButton.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-            this.exportRdfButton.Image = global::RdfTranslationAddIn.Properties.Resources.ExportRdfIcon;
+            this.exportRdfButton.Image = global::ExcelRDF.Properties.Resources.ExportRdfIcon;
             this.exportRdfButton.Label = "Export RDF";
             this.exportRdfButton.Name = "exportRdfButton";
             this.exportRdfButton.ShowImage = true;

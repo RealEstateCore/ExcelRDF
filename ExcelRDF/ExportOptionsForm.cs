@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
-namespace RdfTranslationAddIn
+namespace ExcelRDF
 {
     public partial class ExportOptionsForm : Form
     {

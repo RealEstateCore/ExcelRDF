@@ -8,7 +8,7 @@ using VDS.RDF;
 using VDS.RDF.Ontology;
 using VDS.RDF.Parsing;
 
-namespace RdfTranslationAddIn
+namespace ExcelRDF
 {
     public sealed class RdfOntologyOperations
     {

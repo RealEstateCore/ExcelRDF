@@ -1,4 +1,4 @@
-﻿namespace RdfTranslationAddIn
+﻿namespace ExcelRDF
 {
     partial class ImportOptionsForm
     {

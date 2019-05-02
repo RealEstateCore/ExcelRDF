@@ -1,4 +1,4 @@
-﻿namespace RdfTranslationAddIn
+﻿namespace ExcelRDF
 {
     public partial class ThisAddIn
     {
