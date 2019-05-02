@@ -274,6 +274,12 @@
   <PropertyGroup>
     <ManifestCertificateThumbprint>BCF1E24059FFB758F955A57F5D511DF4B6899CA2</ManifestCertificateThumbprint>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>ExcelRDF_TemporaryKey.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <!-- Include the build rules for a C# project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- Include additional build rules for an Office application add-in. -->
