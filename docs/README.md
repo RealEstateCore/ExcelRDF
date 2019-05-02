@@ -1,4 +1,3 @@
-
 # Requirements
 
 * Microsoft Excel 2010+ for Windows.
