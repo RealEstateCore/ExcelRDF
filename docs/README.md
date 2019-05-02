@@ -4,7 +4,10 @@ This is the GitHub Pages for the ExcelRDF VSTO addin.
 
 ## Installation instructions
 
-1. Add this site, i.e., https://karlhammar.com/ to your your Trusted Sites list in the Control Panel (this is required as I do not have a for-pay code-signing certificate).
-2. Download and execute setup.exe.
-3. ...
-4. Profit!
+1. Add the project site from which the ClickOnce solution is served (i.e., https://karlhammar.com/ExcelRDF/) to your your Trusted Sites list in the Control Panel. This is required as I do not have a for-pay code-signing certificate.
+2. Download and execute setup.exe from the [releases page](https://github.com/hammar/ExcelRDF/releases).
+3. There is no step 3.
+
+## Usage instructions
+
+TBD.
