@@ -60,6 +60,8 @@ When exporting such an Excel skeleton to RDF (whether created wholly in this plu
 
 ![Example data.](images/ExampleData.png){:style="border: 1px solid black; margin-left: 20%; width: 75%"}
 
+<img src="images/ExportRdfButton.png" style="border: 1px solid black; margin-left: 20%; width: 75%;" />
+
 ![Export RDF button.](images/ExportRdfButton.png){:style="border: 1px solid black; margin-left: 20%; width: 75%"}
 
 ![Export RDF dialog.](images/ExportRdfDialog.png){:style="border: 1px solid black; margin-left: 20%; width: 75%"}
