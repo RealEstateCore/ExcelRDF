@@ -1,3 +1,11 @@
+<style>
+img {
+  border: 1px solid black;
+  margin-left: 20%;
+  width: 75%;
+}
+</style>
+
 # ExcelRDF Documentation
 
 ## Functionality
@@ -38,7 +46,7 @@ When exporting such an Excel skeleton to RDF (whether created wholly in this plu
 
 ![Load Ontology button.](images/LoadOntologyButton.png){:style="border: 1px solid black; margin-left: 20%; width: 75%"}
 
-![Import Ontology dialog.](images/ImportOntologyDialog.png){:style="border: 1px solid black; margin-left: 20%; width: 75%"}
+![Import Ontology dialog.](images/ImportOntologyDialog.png)
 
 ![Generated skeleton.](images/GeneratedSkeleton.png){:style="border: 1px solid black; margin-left: 20%; width: 75%"}
 
