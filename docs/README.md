@@ -1,11 +1,3 @@
-<style>
-img {
-  border: 1px solid black;
-  margin-left: 20%;
-  width: 75%;
-}
-</style>
-
 # ExcelRDF Documentation
 
 ## Functionality
