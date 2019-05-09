@@ -273,10 +273,10 @@
     </ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>4369197BEBD4FD3999E48B3DCB7F393625DE5BF2</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>6F62947135BD456D1A27AC27B2B11C150013E0F1</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>ExcelRDF_TemporaryKey.pfx</AssemblyOriginatorKeyFile>
