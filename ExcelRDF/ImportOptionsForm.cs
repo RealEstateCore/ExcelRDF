@@ -9,6 +9,9 @@ namespace ExcelRDF
 {
     public partial class ImportOptionsForm : Form
     {
+        private readonly String NAMED_INDIVIDUAL_LABEL = "Named individual";
+        private readonly String NESTED_ANON_INDIVIDUAL_LABEL = "Nested anonymous individual";
+
         private OntologyGraph graph;
         private Dictionary<TreeNode, HashSet<OntologyProperty>> classToPropertyMap = new Dictionary<TreeNode, HashSet<OntologyProperty>>();
 
@@ -134,6 +137,32 @@ namespace ExcelRDF
             {
                 return Helper.GetLabel(property);
             }
+        }
+
+        private void PropCtxMenuRangeTypeSelector_Click(object sender, EventArgs e)
+        {
+            String selectedOption = propCtxMenuRangeTypeSelector.SelectedItem.ToString();
+            if (selectedOption.Equals(NESTED_ANON_INDIVIDUAL_LABEL))
+            {
+                propCtxMenuSubProperties.Enabled = true;
+                // TODO: add this property to the nestedRangeProperties structure on RdfOntologyOperations
+            }
+            else
+            {
+                propCtxMenuSubProperties.Enabled = false;
+                // TODO: remove this property from the nestedRangeProperties structure on RdfOntologyOperations
+            }
+        }
+
+        private void PropertyContextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // Populate the range type selector
+            propCtxMenuRangeTypeSelector.Items.AddRange(new String[] { NAMED_INDIVIDUAL_LABEL,
+                NESTED_ANON_INDIVIDUAL_LABEL });
+
+            // TODO: implement selection of PropCtxMenuRangeTypeSelector based on status in nestedRangeProperties structure on RdfOntologyOperations
+
+            // TODO: implement loading of propCtxMenuSubProperties based on the selected property 
         }
     }
 }

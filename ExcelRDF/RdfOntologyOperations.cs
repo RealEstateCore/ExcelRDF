@@ -204,7 +204,9 @@ namespace ExcelRDF
         /// Launch the ontology import wizard and generate an Excel skeleton from the ontology.
         /// </summary>
         public void LoadOntology()
-        {
+        {s
+            this.resourcesToImport.Clear();
+
             // Displays an OpenFileDialog so the user can select an ontology.  
             OpenFileDialog openOntologyFileDialog = new OpenFileDialog();
             openOntologyFileDialog.Filter = "RDF/XML (*.rdf)|*.rdf|Turtle (*.ttl)|*.ttl|JSON-LD (*.jsonld)|*.jsonld|NTriples (*.nt)|*.nt|NQuads (*.nq)|*.nq|TriG (*.trig)|*.trig";

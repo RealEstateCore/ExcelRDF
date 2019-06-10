@@ -242,6 +242,7 @@
             this.namespacePrefixesView.MultiSelect = false;
             this.namespacePrefixesView.Name = "namespacePrefixesView";
             this.namespacePrefixesView.RowHeadersVisible = false;
+            this.namespacePrefixesView.RowHeadersWidth = 82;
             this.namespacePrefixesView.RowTemplate.Height = 28;
             this.namespacePrefixesView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.namespacePrefixesView.Size = new System.Drawing.Size(822, 445);
@@ -253,6 +254,7 @@
             this.prefix.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             this.prefix.FillWeight = 40F;
             this.prefix.HeaderText = "Prefix";
+            this.prefix.MinimumWidth = 10;
             this.prefix.Name = "prefix";
             this.prefix.Width = 113;
             // 
@@ -260,6 +262,7 @@
             // 
             this.nspace.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             this.nspace.HeaderText = "Namespace";
+            this.nspace.MinimumWidth = 10;
             this.nspace.Name = "nspace";
             this.nspace.Width = 174;
             // 

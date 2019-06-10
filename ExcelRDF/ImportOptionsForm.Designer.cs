@@ -28,16 +28,25 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.okButton = new System.Windows.Forms.Button();
             this.cancelButton = new System.Windows.Forms.Button();
             this.ontologyClassesTreeView = new System.Windows.Forms.TreeView();
             this.propertiesListBox = new System.Windows.Forms.CheckedListBox();
+            this.propertyContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.propCtxMenuRangeTypeLabel = new System.Windows.Forms.ToolStripMenuItem();
+            this.propCtxMenuRangeTypeSelector = new System.Windows.Forms.ToolStripComboBox();
+            this.propCtxMenuSubProperties = new System.Windows.Forms.ToolStripMenuItem();
+            this.rdfslabelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exexToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importedClassesLabel = new System.Windows.Forms.Label();
             this.importedPropertiesLabel = new System.Windows.Forms.Label();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.classesTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.propertiesTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.outermostTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.propCtxMenuSeparator = new System.Windows.Forms.ToolStripSeparator();
+            this.propertyContextMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -54,7 +63,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.okButton.Location = new System.Drawing.Point(837, 609);
-            this.okButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.okButton.Margin = new System.Windows.Forms.Padding(4);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(125, 54);
             this.okButton.TabIndex = 0;
@@ -69,7 +78,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.cancelButton.Location = new System.Drawing.Point(704, 609);
-            this.cancelButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cancelButton.Margin = new System.Windows.Forms.Padding(4);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(125, 54);
             this.cancelButton.TabIndex = 1;
@@ -84,7 +93,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ontologyClassesTreeView.CheckBoxes = true;
             this.ontologyClassesTreeView.Location = new System.Drawing.Point(4, 42);
-            this.ontologyClassesTreeView.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ontologyClassesTreeView.Margin = new System.Windows.Forms.Padding(4);
             this.ontologyClassesTreeView.Name = "ontologyClassesTreeView";
             this.ontologyClassesTreeView.Size = new System.Drawing.Size(446, 543);
             this.ontologyClassesTreeView.TabIndex = 2;
@@ -96,15 +105,64 @@
             this.propertiesListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.propertiesListBox.ContextMenuStrip = this.propertyContextMenu;
             this.propertiesListBox.FormattingEnabled = true;
             this.propertiesListBox.IntegralHeight = false;
             this.propertiesListBox.Location = new System.Drawing.Point(4, 42);
-            this.propertiesListBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.propertiesListBox.Margin = new System.Windows.Forms.Padding(4);
             this.propertiesListBox.Name = "propertiesListBox";
             this.propertiesListBox.ScrollAlwaysVisible = true;
-            this.propertiesListBox.Size = new System.Drawing.Size(475, 539);
+            this.propertiesListBox.Size = new System.Drawing.Size(473, 539);
             this.propertiesListBox.TabIndex = 3;
             this.propertiesListBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.PropertiesListBox_ItemCheck);
+            // 
+            // propertyContextMenu
+            // 
+            this.propertyContextMenu.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this.propertyContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.propCtxMenuRangeTypeLabel,
+            this.propCtxMenuRangeTypeSelector,
+            this.propCtxMenuSeparator,
+            this.propCtxMenuSubProperties});
+            this.propertyContextMenu.Name = "propertyContextMenu";
+            this.propertyContextMenu.Size = new System.Drawing.Size(461, 178);
+            this.propertyContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.PropertyContextMenu_Opening);
+            // 
+            // propCtxMenuRangeTypeLabel
+            // 
+            this.propCtxMenuRangeTypeLabel.Name = "propCtxMenuRangeTypeLabel";
+            this.propCtxMenuRangeTypeLabel.Size = new System.Drawing.Size(460, 38);
+            this.propCtxMenuRangeTypeLabel.Text = "Property range type:";
+            // 
+            // propCtxMenuRangeTypeSelector
+            // 
+            this.propCtxMenuRangeTypeSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.propCtxMenuRangeTypeSelector.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.propCtxMenuRangeTypeSelector.Name = "propCtxMenuRangeTypeSelector";
+            this.propCtxMenuRangeTypeSelector.Size = new System.Drawing.Size(400, 40);
+            this.propCtxMenuRangeTypeSelector.Click += new System.EventHandler(this.PropCtxMenuRangeTypeSelector_Click);
+            // 
+            // propCtxMenuSubProperties
+            // 
+            this.propCtxMenuSubProperties.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.rdfslabelToolStripMenuItem,
+            this.exexToolStripMenuItem});
+            this.propCtxMenuSubProperties.Enabled = false;
+            this.propCtxMenuSubProperties.Name = "propCtxMenuSubProperties";
+            this.propCtxMenuSubProperties.Size = new System.Drawing.Size(460, 38);
+            this.propCtxMenuSubProperties.Text = "Anonymous individual properties:";
+            // 
+            // rdfslabelToolStripMenuItem
+            // 
+            this.rdfslabelToolStripMenuItem.Name = "rdfslabelToolStripMenuItem";
+            this.rdfslabelToolStripMenuItem.Size = new System.Drawing.Size(359, 44);
+            this.rdfslabelToolStripMenuItem.Text = "rdfs:label";
+            // 
+            // exexToolStripMenuItem
+            // 
+            this.exexToolStripMenuItem.Name = "exexToolStripMenuItem";
+            this.exexToolStripMenuItem.Size = new System.Drawing.Size(359, 44);
+            this.exexToolStripMenuItem.Text = "ex:ex";
             // 
             // importedClassesLabel
             // 
@@ -131,7 +189,7 @@
             this.importedPropertiesLabel.Location = new System.Drawing.Point(4, 0);
             this.importedPropertiesLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.importedPropertiesLabel.Name = "importedPropertiesLabel";
-            this.importedPropertiesLabel.Size = new System.Drawing.Size(475, 38);
+            this.importedPropertiesLabel.Size = new System.Drawing.Size(473, 38);
             this.importedPropertiesLabel.TabIndex = 5;
             this.importedPropertiesLabel.Text = "Imported properties:";
             this.importedPropertiesLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -143,7 +201,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.outermostTableLayoutPanel.SetColumnSpan(this.splitContainer1, 3);
             this.splitContainer1.Location = new System.Drawing.Point(4, 4);
-            this.splitContainer1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.splitContainer1.Margin = new System.Windows.Forms.Padding(4);
             this.splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -168,7 +226,7 @@
             this.classesTableLayoutPanel.Controls.Add(this.importedClassesLabel, 0, 0);
             this.classesTableLayoutPanel.Controls.Add(this.ontologyClassesTreeView, 0, 1);
             this.classesTableLayoutPanel.Location = new System.Drawing.Point(4, 4);
-            this.classesTableLayoutPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.classesTableLayoutPanel.Margin = new System.Windows.Forms.Padding(4);
             this.classesTableLayoutPanel.Name = "classesTableLayoutPanel";
             this.classesTableLayoutPanel.RowCount = 2;
             this.classesTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 38F));
@@ -186,12 +244,12 @@
             this.propertiesTableLayoutPanel.Controls.Add(this.importedPropertiesLabel, 0, 0);
             this.propertiesTableLayoutPanel.Controls.Add(this.propertiesListBox, 0, 1);
             this.propertiesTableLayoutPanel.Location = new System.Drawing.Point(4, 4);
-            this.propertiesTableLayoutPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.propertiesTableLayoutPanel.Margin = new System.Windows.Forms.Padding(4);
             this.propertiesTableLayoutPanel.Name = "propertiesTableLayoutPanel";
             this.propertiesTableLayoutPanel.RowCount = 2;
             this.propertiesTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 38F));
             this.propertiesTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.propertiesTableLayoutPanel.Size = new System.Drawing.Size(483, 585);
+            this.propertiesTableLayoutPanel.Size = new System.Drawing.Size(481, 585);
             this.propertiesTableLayoutPanel.TabIndex = 0;
             // 
             // outermostTableLayoutPanel
@@ -207,7 +265,7 @@
             this.outermostTableLayoutPanel.Controls.Add(this.splitContainer1, 0, 0);
             this.outermostTableLayoutPanel.Controls.Add(this.cancelButton, 1, 1);
             this.outermostTableLayoutPanel.Location = new System.Drawing.Point(16, 15);
-            this.outermostTableLayoutPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.outermostTableLayoutPanel.Margin = new System.Windows.Forms.Padding(4);
             this.outermostTableLayoutPanel.Name = "outermostTableLayoutPanel";
             this.outermostTableLayoutPanel.RowCount = 2;
             this.outermostTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -215,15 +273,21 @@
             this.outermostTableLayoutPanel.Size = new System.Drawing.Size(966, 667);
             this.outermostTableLayoutPanel.TabIndex = 5;
             // 
+            // propCtxMenuSeparator
+            // 
+            this.propCtxMenuSeparator.Name = "propCtxMenuSeparator";
+            this.propCtxMenuSeparator.Size = new System.Drawing.Size(457, 6);
+            // 
             // ImportOptionsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(998, 697);
             this.Controls.Add(this.outermostTableLayoutPanel);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "ImportOptionsForm";
             this.Text = "Ontology Import Options";
+            this.propertyContextMenu.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
@@ -249,5 +313,12 @@
         private System.Windows.Forms.TableLayoutPanel outermostTableLayoutPanel;
         private System.Windows.Forms.TableLayoutPanel classesTableLayoutPanel;
         private System.Windows.Forms.TableLayoutPanel propertiesTableLayoutPanel;
+        private System.Windows.Forms.ContextMenuStrip propertyContextMenu;
+        private System.Windows.Forms.ToolStripMenuItem propCtxMenuRangeTypeLabel;
+        private System.Windows.Forms.ToolStripComboBox propCtxMenuRangeTypeSelector;
+        private System.Windows.Forms.ToolStripMenuItem propCtxMenuSubProperties;
+        private System.Windows.Forms.ToolStripMenuItem rdfslabelToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exexToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator propCtxMenuSeparator;
     }
 }
