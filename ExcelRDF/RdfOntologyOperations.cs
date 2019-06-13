@@ -204,7 +204,7 @@ namespace ExcelRDF
         /// Launch the ontology import wizard and generate an Excel skeleton from the ontology.
         /// </summary>
         public void LoadOntology()
-        {s
+        {
             this.resourcesToImport.Clear();
 
             // Displays an OpenFileDialog so the user can select an ontology.  

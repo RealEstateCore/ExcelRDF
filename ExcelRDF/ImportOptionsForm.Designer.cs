@@ -36,6 +36,7 @@
             this.propertyContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.propCtxMenuRangeTypeLabel = new System.Windows.Forms.ToolStripMenuItem();
             this.propCtxMenuRangeTypeSelector = new System.Windows.Forms.ToolStripComboBox();
+            this.propCtxMenuSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.propCtxMenuSubProperties = new System.Windows.Forms.ToolStripMenuItem();
             this.rdfslabelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exexToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -45,7 +46,6 @@
             this.classesTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.propertiesTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.outermostTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.propCtxMenuSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.propertyContextMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -112,7 +112,7 @@
             this.propertiesListBox.Margin = new System.Windows.Forms.Padding(4);
             this.propertiesListBox.Name = "propertiesListBox";
             this.propertiesListBox.ScrollAlwaysVisible = true;
-            this.propertiesListBox.Size = new System.Drawing.Size(473, 539);
+            this.propertiesListBox.Size = new System.Drawing.Size(472, 539);
             this.propertiesListBox.TabIndex = 3;
             this.propertiesListBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.PropertiesListBox_ItemCheck);
             // 
@@ -141,6 +141,11 @@
             this.propCtxMenuRangeTypeSelector.Name = "propCtxMenuRangeTypeSelector";
             this.propCtxMenuRangeTypeSelector.Size = new System.Drawing.Size(400, 40);
             this.propCtxMenuRangeTypeSelector.Click += new System.EventHandler(this.PropCtxMenuRangeTypeSelector_Click);
+            // 
+            // propCtxMenuSeparator
+            // 
+            this.propCtxMenuSeparator.Name = "propCtxMenuSeparator";
+            this.propCtxMenuSeparator.Size = new System.Drawing.Size(457, 6);
             // 
             // propCtxMenuSubProperties
             // 
@@ -189,7 +194,7 @@
             this.importedPropertiesLabel.Location = new System.Drawing.Point(4, 0);
             this.importedPropertiesLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.importedPropertiesLabel.Name = "importedPropertiesLabel";
-            this.importedPropertiesLabel.Size = new System.Drawing.Size(473, 38);
+            this.importedPropertiesLabel.Size = new System.Drawing.Size(472, 38);
             this.importedPropertiesLabel.TabIndex = 5;
             this.importedPropertiesLabel.Text = "Imported properties:";
             this.importedPropertiesLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -249,7 +254,7 @@
             this.propertiesTableLayoutPanel.RowCount = 2;
             this.propertiesTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 38F));
             this.propertiesTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.propertiesTableLayoutPanel.Size = new System.Drawing.Size(481, 585);
+            this.propertiesTableLayoutPanel.Size = new System.Drawing.Size(480, 585);
             this.propertiesTableLayoutPanel.TabIndex = 0;
             // 
             // outermostTableLayoutPanel
@@ -272,11 +277,6 @@
             this.outermostTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 62F));
             this.outermostTableLayoutPanel.Size = new System.Drawing.Size(966, 667);
             this.outermostTableLayoutPanel.TabIndex = 5;
-            // 
-            // propCtxMenuSeparator
-            // 
-            this.propCtxMenuSeparator.Name = "propCtxMenuSeparator";
-            this.propCtxMenuSeparator.Size = new System.Drawing.Size(457, 6);
             // 
             // ImportOptionsForm
             // 

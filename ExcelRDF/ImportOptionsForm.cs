@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
+using VDS.RDF;
 using VDS.RDF.Ontology;
+using VDS.RDF.Parsing;
 
 namespace ExcelRDF
 {
@@ -142,6 +144,7 @@ namespace ExcelRDF
         private void PropCtxMenuRangeTypeSelector_Click(object sender, EventArgs e)
         {
             String selectedOption = propCtxMenuRangeTypeSelector.SelectedItem.ToString();
+            // TODO: This does not work, the else menu is only enabled in the inverse case, debug
             if (selectedOption.Equals(NESTED_ANON_INDIVIDUAL_LABEL))
             {
                 propCtxMenuSubProperties.Enabled = true;
@@ -161,8 +164,32 @@ namespace ExcelRDF
                 NESTED_ANON_INDIVIDUAL_LABEL });
 
             // TODO: implement selection of PropCtxMenuRangeTypeSelector based on status in nestedRangeProperties structure on RdfOntologyOperations
+            propCtxMenuRangeTypeSelector.SelectedIndex = 0;
 
-            // TODO: implement loading of propCtxMenuSubProperties based on the selected property 
+            // Load submenus in propCtxMenuSubProperties based on the selected property
+            propCtxMenuSubProperties.DropDownItems.Clear();
+            List<OntologyProperty> subProperties = new List<OntologyProperty>();
+            subProperties.Add(graph.CreateOntologyProperty(graph.CreateUriNode(new Uri(OntologyHelper.PropertyLabel))));
+            OntologyProperty selectedProperty = ((PropertyListItem)propertiesListBox.SelectedItem).property;
+            // TODO: This is horribly slow on non-trivial sized graphs; very likely needs to be changed!
+            foreach (OntologyClass range in selectedProperty.Ranges)
+            {
+                foreach (OntologyProperty subPropertyCandidate in graph.OwlProperties)
+                {
+                    if (subPropertyCandidate.Domains.Contains(range))
+                    {
+                        subProperties.Add(subPropertyCandidate);
+                    }
+                }
+            }
+            foreach (OntologyProperty subProperty in subProperties)
+            {
+                // TODO: use label?
+                ToolStripMenuItem newItem = new ToolStripMenuItem(subProperty.ToString());
+                newItem.Checked = true;
+                newItem.CheckOnClick = true;
+                propCtxMenuSubProperties.DropDownItems.Add(newItem);
+            }
         }
     }
 }
