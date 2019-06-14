@@ -38,8 +38,6 @@
             this.propCtxMenuRangeTypeSelector = new System.Windows.Forms.ToolStripComboBox();
             this.propCtxMenuSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.propCtxMenuSubProperties = new System.Windows.Forms.ToolStripMenuItem();
-            this.rdfslabelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exexToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importedClassesLabel = new System.Windows.Forms.Label();
             this.importedPropertiesLabel = new System.Windows.Forms.Label();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
@@ -112,7 +110,7 @@
             this.propertiesListBox.Margin = new System.Windows.Forms.Padding(4);
             this.propertiesListBox.Name = "propertiesListBox";
             this.propertiesListBox.ScrollAlwaysVisible = true;
-            this.propertiesListBox.Size = new System.Drawing.Size(472, 539);
+            this.propertiesListBox.Size = new System.Drawing.Size(469, 539);
             this.propertiesListBox.TabIndex = 3;
             this.propertiesListBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.PropertiesListBox_ItemCheck);
             // 
@@ -125,13 +123,13 @@
             this.propCtxMenuSeparator,
             this.propCtxMenuSubProperties});
             this.propertyContextMenu.Name = "propertyContextMenu";
-            this.propertyContextMenu.Size = new System.Drawing.Size(461, 178);
+            this.propertyContextMenu.Size = new System.Drawing.Size(461, 170);
             this.propertyContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.PropertyContextMenu_Opening);
             // 
             // propCtxMenuRangeTypeLabel
             // 
             this.propCtxMenuRangeTypeLabel.Name = "propCtxMenuRangeTypeLabel";
-            this.propCtxMenuRangeTypeLabel.Size = new System.Drawing.Size(460, 38);
+            this.propCtxMenuRangeTypeLabel.Size = new System.Drawing.Size(460, 36);
             this.propCtxMenuRangeTypeLabel.Text = "Property range type:";
             // 
             // propCtxMenuRangeTypeSelector
@@ -140,7 +138,7 @@
             this.propCtxMenuRangeTypeSelector.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.propCtxMenuRangeTypeSelector.Name = "propCtxMenuRangeTypeSelector";
             this.propCtxMenuRangeTypeSelector.Size = new System.Drawing.Size(400, 40);
-            this.propCtxMenuRangeTypeSelector.Click += new System.EventHandler(this.PropCtxMenuRangeTypeSelector_Click);
+            this.propCtxMenuRangeTypeSelector.SelectedIndexChanged += new System.EventHandler(this.PropCtxMenuRangeTypeSelector_SelectedIndexChanged);
             // 
             // propCtxMenuSeparator
             // 
@@ -149,25 +147,10 @@
             // 
             // propCtxMenuSubProperties
             // 
-            this.propCtxMenuSubProperties.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.rdfslabelToolStripMenuItem,
-            this.exexToolStripMenuItem});
             this.propCtxMenuSubProperties.Enabled = false;
             this.propCtxMenuSubProperties.Name = "propCtxMenuSubProperties";
-            this.propCtxMenuSubProperties.Size = new System.Drawing.Size(460, 38);
+            this.propCtxMenuSubProperties.Size = new System.Drawing.Size(460, 36);
             this.propCtxMenuSubProperties.Text = "Anonymous individual properties:";
-            // 
-            // rdfslabelToolStripMenuItem
-            // 
-            this.rdfslabelToolStripMenuItem.Name = "rdfslabelToolStripMenuItem";
-            this.rdfslabelToolStripMenuItem.Size = new System.Drawing.Size(359, 44);
-            this.rdfslabelToolStripMenuItem.Text = "rdfs:label";
-            // 
-            // exexToolStripMenuItem
-            // 
-            this.exexToolStripMenuItem.Name = "exexToolStripMenuItem";
-            this.exexToolStripMenuItem.Size = new System.Drawing.Size(359, 44);
-            this.exexToolStripMenuItem.Text = "ex:ex";
             // 
             // importedClassesLabel
             // 
@@ -194,7 +177,7 @@
             this.importedPropertiesLabel.Location = new System.Drawing.Point(4, 0);
             this.importedPropertiesLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.importedPropertiesLabel.Name = "importedPropertiesLabel";
-            this.importedPropertiesLabel.Size = new System.Drawing.Size(472, 38);
+            this.importedPropertiesLabel.Size = new System.Drawing.Size(469, 38);
             this.importedPropertiesLabel.TabIndex = 5;
             this.importedPropertiesLabel.Text = "Imported properties:";
             this.importedPropertiesLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -254,7 +237,7 @@
             this.propertiesTableLayoutPanel.RowCount = 2;
             this.propertiesTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 38F));
             this.propertiesTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.propertiesTableLayoutPanel.Size = new System.Drawing.Size(480, 585);
+            this.propertiesTableLayoutPanel.Size = new System.Drawing.Size(477, 585);
             this.propertiesTableLayoutPanel.TabIndex = 0;
             // 
             // outermostTableLayoutPanel
@@ -317,8 +300,6 @@
         private System.Windows.Forms.ToolStripMenuItem propCtxMenuRangeTypeLabel;
         private System.Windows.Forms.ToolStripComboBox propCtxMenuRangeTypeSelector;
         private System.Windows.Forms.ToolStripMenuItem propCtxMenuSubProperties;
-        private System.Windows.Forms.ToolStripMenuItem rdfslabelToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem exexToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator propCtxMenuSeparator;
     }
 }

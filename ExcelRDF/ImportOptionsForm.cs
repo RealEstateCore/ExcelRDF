@@ -5,17 +5,17 @@ using System.Linq;
 using System.Windows.Forms;
 using VDS.RDF;
 using VDS.RDF.Ontology;
-using VDS.RDF.Parsing;
 
 namespace ExcelRDF
 {
     public partial class ImportOptionsForm : Form
     {
-        private readonly String NAMED_INDIVIDUAL_LABEL = "Named individual";
-        private readonly String NESTED_ANON_INDIVIDUAL_LABEL = "Nested anonymous individual";
+        private readonly string NAMED_INDIVIDUAL_LABEL = "Named individual";
+        private readonly string NESTED_ANON_INDIVIDUAL_LABEL = "Nested anonymous individual";
 
         private OntologyGraph graph;
         private Dictionary<TreeNode, HashSet<OntologyProperty>> classToPropertyMap = new Dictionary<TreeNode, HashSet<OntologyProperty>>();
+        private bool _noise = false;
 
         /// <summary>
         /// 
@@ -26,6 +26,7 @@ namespace ExcelRDF
             InitializeComponent();
             this.graph = graph;
             RdfOntologyOperations.instance.resourcesToImport.Clear();
+            RdfOntologyOperations.instance.nestedProperties.Clear();
             InitializeTreeView();
         }
 
@@ -73,12 +74,12 @@ namespace ExcelRDF
 
         private void OkButton_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void CancelButton_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         /// <summary>
@@ -141,36 +142,51 @@ namespace ExcelRDF
             }
         }
 
-        private void PropCtxMenuRangeTypeSelector_Click(object sender, EventArgs e)
+        private void PropCtxMenuRangeTypeSelector_SelectedIndexChanged(object sender, EventArgs e)
         {
-            String selectedOption = propCtxMenuRangeTypeSelector.SelectedItem.ToString();
-            // TODO: This does not work, the else menu is only enabled in the inverse case, debug
+            if (_noise) return;
+            string selectedOption = (string)propCtxMenuRangeTypeSelector.SelectedItem;
+            OntologyProperty selectedProperty = ((PropertyListItem)propertiesListBox.SelectedItem).property;
+            Uri selectedPropertyUri = ((UriNode)selectedProperty.Resource).Uri;
             if (selectedOption.Equals(NESTED_ANON_INDIVIDUAL_LABEL))
             {
                 propCtxMenuSubProperties.Enabled = true;
-                // TODO: add this property to the nestedRangeProperties structure on RdfOntologyOperations
+                RdfOntologyOperations.instance.nestedProperties[selectedPropertyUri] = new HashSet<Uri>();
             }
             else
             {
                 propCtxMenuSubProperties.Enabled = false;
-                // TODO: remove this property from the nestedRangeProperties structure on RdfOntologyOperations
+                RdfOntologyOperations.instance.nestedProperties.Remove(selectedPropertyUri);
             }
         }
 
         private void PropertyContextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            OntologyProperty selectedProperty = ((PropertyListItem)propertiesListBox.SelectedItem).property;
+            Uri selectedPropertyUri = ((UriNode)selectedProperty.Resource).Uri;
+
             // Populate the range type selector
+            propCtxMenuRangeTypeSelector.Items.Clear();
             propCtxMenuRangeTypeSelector.Items.AddRange(new String[] { NAMED_INDIVIDUAL_LABEL,
                 NESTED_ANON_INDIVIDUAL_LABEL });
 
-            // TODO: implement selection of PropCtxMenuRangeTypeSelector based on status in nestedRangeProperties structure on RdfOntologyOperations
-            propCtxMenuRangeTypeSelector.SelectedIndex = 0;
+            _noise = true;
+            if (!RdfOntologyOperations.instance.nestedProperties.ContainsKey(selectedPropertyUri)) {
+                propCtxMenuRangeTypeSelector.SelectedIndex = 0;
+                propCtxMenuSubProperties.Enabled = false;
+            }
+            else
+            {
+                propCtxMenuRangeTypeSelector.SelectedIndex = 1;
+                propCtxMenuSubProperties.Enabled = true;
+            }
+            _noise = false;
 
             // Load submenus in propCtxMenuSubProperties based on the selected property
             propCtxMenuSubProperties.DropDownItems.Clear();
-            List<OntologyProperty> subProperties = new List<OntologyProperty>();
-            subProperties.Add(graph.CreateOntologyProperty(graph.CreateUriNode(new Uri(OntologyHelper.PropertyLabel))));
-            OntologyProperty selectedProperty = ((PropertyListItem)propertiesListBox.SelectedItem).property;
+            List<Uri> subPropertyUris = new List<Uri>();
+            subPropertyUris.Add(new Uri(OntologyHelper.PropertyLabel));
+
             // TODO: This is horribly slow on non-trivial sized graphs; very likely needs to be changed!
             foreach (OntologyClass range in selectedProperty.Ranges)
             {
@@ -178,17 +194,50 @@ namespace ExcelRDF
                 {
                     if (subPropertyCandidate.Domains.Contains(range))
                     {
-                        subProperties.Add(subPropertyCandidate);
+                        Uri subPropertyCandidateUri = ((UriNode)subPropertyCandidate.Resource).Uri;
+                        subPropertyUris.Add(subPropertyCandidateUri);
                     }
                 }
             }
-            foreach (OntologyProperty subProperty in subProperties)
+            foreach (Uri subPropertyUri in subPropertyUris)
             {
-                // TODO: use label?
-                ToolStripMenuItem newItem = new ToolStripMenuItem(subProperty.ToString());
-                newItem.Checked = true;
-                newItem.CheckOnClick = true;
+
+
+                ToolStripMenuItem newItem = new ToolStripMenuItem(subPropertyUri.ToString())
+                {
+                    Checked = false,
+                    CheckOnClick = true,
+                    Tag = subPropertyUri,
+                };
+                newItem.CheckedChanged += new EventHandler(this.NestedProperty_CheckedChanged);
                 propCtxMenuSubProperties.DropDownItems.Add(newItem);
+
+                if (RdfOntologyOperations.instance.nestedProperties.ContainsKey(selectedPropertyUri)) {
+                    HashSet<Uri> nestedProperties = RdfOntologyOperations.instance.nestedProperties[selectedPropertyUri];
+                    if (nestedProperties.Contains(subPropertyUri))
+                    {
+                        newItem.Checked = true;
+                    }
+                    else
+                    {
+                        newItem.Checked = false;
+                    }
+                }
+            }
+        }
+
+        private void NestedProperty_CheckedChanged(object sender, EventArgs e)
+        {
+            OntologyProperty selectedProperty = ((PropertyListItem)propertiesListBox.SelectedItem).property;
+            Uri selectedPropertyUri = ((UriNode)selectedProperty.Resource).Uri;
+            Uri nestedPropertyUri = (Uri)((ToolStripMenuItem)sender).Tag;
+            if (((ToolStripMenuItem)sender).Checked)
+            {
+                RdfOntologyOperations.instance.nestedProperties[selectedPropertyUri].Add(nestedPropertyUri);
+            }
+            else
+            {
+                RdfOntologyOperations.instance.nestedProperties[selectedPropertyUri].Remove(nestedPropertyUri);
             }
         }
     }

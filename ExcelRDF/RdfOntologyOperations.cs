@@ -18,6 +18,7 @@ namespace ExcelRDF
         public HashSet<Uri> candidateNamespacesToMap;
         public Dictionary<string, Uri> exportPrefixMappings;
         public HashSet<string> resourcesToImport = new HashSet<string>();
+        public Dictionary<Uri, HashSet<Uri>> nestedProperties = new Dictionary<Uri, HashSet<Uri>>();
 
         // Explicit static constructor to tell C# compiler
         // not to mark type as beforefieldinit
@@ -206,6 +207,7 @@ namespace ExcelRDF
         public void LoadOntology()
         {
             this.resourcesToImport.Clear();
+            this.nestedProperties.Clear();
 
             // Displays an OpenFileDialog so the user can select an ontology.  
             OpenFileDialog openOntologyFileDialog = new OpenFileDialog();
