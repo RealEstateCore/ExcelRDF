@@ -154,42 +154,47 @@ namespace ExcelRDF
                                 // Set subject node ID. 
                                 string identifierCellIdentifier = String.Format("{0}{1}", Helper.GetExcelColumnName(identifierColumn), rowIndex);
                                 Range identifierCell = worksheet.get_Range(identifierCellIdentifier);
-                                Uri subjectUri = new Uri(exportNamespace.ToString() + identifierCell.Text);
-                                IUriNode subjectNode = g.CreateUriNode(subjectUri);
-                                g.Assert(new Triple(subjectNode, rdfType, worksheetClass));
 
-                                // Iterate over remaining columns, i.e., property instances, skipping the identifier column if it reappears
-                                foreach (Range dataCell in row.Cells)
+                                // Only parse rows that have an identifier
+                                if (identifierCell.Text != "")
                                 {
-                                    if (dataCell.Column == identifierColumn)
+                                    Uri subjectUri = new Uri(exportNamespace.ToString() + identifierCell.Text);
+                                    IUriNode subjectNode = g.CreateUriNode(subjectUri);
+                                    g.Assert(new Triple(subjectNode, rdfType, worksheetClass));
+
+                                    // Iterate over remaining columns, i.e., property instances, skipping the identifier column if it reappears
+                                    foreach (Range dataCell in row.Cells)
                                     {
-                                        continue;
-                                    }
-
-                                    HeaderFields hf = headerLookupTable[dataCell.Column];
-                                    IUriNode predicateNode = hf.propertyIri;
-
-                                    // Get out and parse object. 
-                                    // "Raw" cell value, will need treatment (TODO!)
-                                    INode objectNode;
-                                    string cellValue = dataCell.Text;
-
-                                    // Check so cell isn't empty
-                                    if (!cellValue.Equals(""))
-                                    {
-
-                                        if (hf.propertyType.ToString().Equals(OntologyHelper.OwlDatatypeProperty))
+                                        if (dataCell.Column == identifierColumn)
                                         {
-                                            objectNode = g.CreateLiteralNode(cellValue, hf.propertyRange);
+                                            continue;
                                         }
-                                        else
-                                        {
-                                            Uri objectUri = new Uri(exportNamespace.ToString() + cellValue);
-                                            objectNode = g.CreateUriNode(objectUri);
-                                        }
-                                        g.Assert(new Triple(subjectNode, predicateNode, objectNode));
-                                    }
 
+                                        HeaderFields hf = headerLookupTable[dataCell.Column];
+                                        IUriNode predicateNode = hf.propertyIri;
+
+                                        // Get out and parse object. 
+                                        // "Raw" cell value, will need treatment (TODO!)
+                                        INode objectNode;
+                                        string cellValue = dataCell.Text;
+
+                                        // Check so cell isn't empty
+                                        if (!cellValue.Equals(""))
+                                        {
+
+                                            if (hf.propertyType.ToString().Equals(OntologyHelper.OwlDatatypeProperty))
+                                            {
+                                                objectNode = g.CreateLiteralNode(cellValue, hf.propertyRange);
+                                            }
+                                            else
+                                            {
+                                                Uri objectUri = new Uri(exportNamespace.ToString() + cellValue);
+                                                objectNode = g.CreateUriNode(objectUri);
+                                            }
+                                            g.Assert(new Triple(subjectNode, predicateNode, objectNode));
+                                        }
+
+                                    }
                                 }
                             }
                             String saveFileExtension = Path.GetExtension(saveRdfFileDialog.FileName);
