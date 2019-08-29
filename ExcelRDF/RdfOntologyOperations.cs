@@ -109,31 +109,25 @@ namespace ExcelRDF
                                 string[] noteTextComponents = noteText.Split('\n');
 
                                 string iriComponent = noteTextComponents[0];
-                                if (iriComponent.Equals("<IRI>"))
+                                if (iriComponent.Equals("<IRI>") && noteTextComponents.Count() == 2)
                                 {
                                     // This is the identifier column; update worksheet metadata accordingly
                                     identifierColumn = headerCell.Column;
-                                    if (noteTextComponents.Count() > 1)
-                                    {
-                                        string classComponent = noteTextComponents[1];
-                                        string classComponentTrimmed = classComponent.Trim(trimUrisChars);
-                                        className = new Uri(classComponentTrimmed);
-                                    }
+                                    string classComponent = noteTextComponents[1];
+                                    string classComponentTrimmed = classComponent.Trim(trimUrisChars);
+                                    className = new Uri(classComponentTrimmed);
                                 }
-                                else
+                                else if (noteTextComponents.Count() == 3)
                                 {
                                     HeaderFields hf = new HeaderFields();
                                     hf.propertyIri = g.CreateUriNode(UriFactory.Create(iriComponent.Trim(trimUrisChars)));
-                                    if (noteTextComponents.Count() > 1)
-                                    {
-                                        string propertyTypeComponent = noteTextComponents[1];
-                                        hf.propertyType = new Uri(propertyTypeComponent.Trim(trimUrisChars));
-                                    }
-                                    if (noteTextComponents.Count() > 2)
-                                    {
-                                        string propertyRangeComponent = noteTextComponents[2];
-                                        hf.propertyRange = new Uri(propertyRangeComponent.Trim(trimUrisChars));
-                                    }
+
+                                    string propertyTypeComponent = noteTextComponents[1];
+                                    hf.propertyType = new Uri(propertyTypeComponent.Trim(trimUrisChars));
+                                    
+                                    string propertyRangeComponent = noteTextComponents[2];
+                                    hf.propertyRange = new Uri(propertyRangeComponent.Trim(trimUrisChars));
+                                    
                                     headerLookupTable[column] = hf;
                                 }
                             }
@@ -170,7 +164,15 @@ namespace ExcelRDF
                                             continue;
                                         }
 
+                                        // Get header fields
                                         HeaderFields hf = headerLookupTable[dataCell.Column];
+
+                                        // Check that there actually are header fields for the cell under consideration; otherwise, ignore cell
+                                        // This is not a simple null check since HeaderFields is a struct, e.g., value type, which cannot be null
+                                        if (hf.Equals(default(HeaderFields))) {
+                                            continue;
+                                        }
+
                                         IUriNode predicateNode = hf.propertyIri;
 
                                         // Get out and parse object. 
@@ -178,10 +180,9 @@ namespace ExcelRDF
                                         INode objectNode;
                                         string cellValue = dataCell.Text;
 
-                                        // Check so cell isn't empty
+                                        // Check so cell isn't empty and the header values are sane
                                         if (!cellValue.Equals(""))
                                         {
-
                                             if (hf.propertyType.ToString().Equals(OntologyHelper.OwlDatatypeProperty))
                                             {
                                                 objectNode = g.CreateLiteralNode(cellValue, hf.propertyRange);
@@ -193,7 +194,6 @@ namespace ExcelRDF
                                             }
                                             g.Assert(new Triple(subjectNode, predicateNode, objectNode));
                                         }
-
                                     }
                                 }
                             }
