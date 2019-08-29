@@ -180,18 +180,33 @@ namespace ExcelRDF
                                         INode objectNode;
                                         string cellValue = dataCell.Text;
 
-                                        // Check so cell isn't empty and the header values are sane
+                                        // Check so cell isn't empty
                                         if (!cellValue.Equals(""))
                                         {
-                                            if (hf.propertyType.ToString().Equals(OntologyHelper.OwlDatatypeProperty))
+                                            switch (hf.propertyType.ToString())
                                             {
-                                                objectNode = g.CreateLiteralNode(cellValue, hf.propertyRange);
+                                                case OntologyHelper.OwlDatatypeProperty:
+                                                    objectNode = g.CreateLiteralNode(cellValue, hf.propertyRange);
+                                                    break;
+                                                case OntologyHelper.OwlObjectProperty:
+                                                    objectNode = g.CreateUriNode(new Uri(exportNamespace.ToString() + cellValue));
+                                                    break;
+                                                case OntologyHelper.OwlAnnotationProperty:
+                                                    // For annotation properties we use literal object nodes if property range is in XSD namespace
+                                                    // and uri nodes otherwise.
+                                                    if (hf.propertyRange.ToString().Contains(XmlSpecsHelper.NamespaceXmlSchema))
+                                                    {
+                                                        objectNode = g.CreateLiteralNode(cellValue, hf.propertyRange);
+                                                    }
+                                                    else
+                                                    {
+                                                        objectNode = g.CreateUriNode(new Uri(exportNamespace.ToString() + cellValue));
+                                                    }
+                                                    break;
+                                                default:
+                                                    continue;
                                             }
-                                            else
-                                            {
-                                                Uri objectUri = new Uri(exportNamespace.ToString() + cellValue);
-                                                objectNode = g.CreateUriNode(objectUri);
-                                            }
+
                                             g.Assert(new Triple(subjectNode, predicateNode, objectNode));
                                         }
                                     }
