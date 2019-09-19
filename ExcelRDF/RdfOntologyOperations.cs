@@ -200,49 +200,99 @@ namespace ExcelRDF
                                         // Get header fields
                                         HeaderFields hf = headerLookupTable[dataCell.Column];
 
-                                        // TODO: handle the nested properties case
-
                                         // Check that there actually are header fields for the cell under consideration; otherwise, ignore cell
                                         // This is not a simple null check since HeaderFields is a struct, e.g., value type, which cannot be null
                                         if (hf.Equals(default(HeaderFields))) {
                                             continue;
                                         }
 
-                                        IUriNode predicateNode = hf.propertyIri;
-
-                                        // Get out and parse object. 
-                                        // "Raw" cell value, will need treatment (TODO!)
-                                        INode objectNode;
-                                        string cellValue = dataCell.Text;
-
-                                        // Check so cell isn't empty
-                                        if (!cellValue.Equals(""))
+                                        if (hf.nestedIri != null)
                                         {
-                                            switch (hf.propertyType.ToString())
-                                            {
-                                                case OntologyHelper.OwlDatatypeProperty:
-                                                    objectNode = g.CreateLiteralNode(cellValue, hf.propertyRange);
-                                                    break;
-                                                case OntologyHelper.OwlObjectProperty:
-                                                    objectNode = g.CreateUriNode(new Uri(exportNamespace.ToString() + cellValue));
-                                                    break;
-                                                case OntologyHelper.OwlAnnotationProperty:
-                                                    // For annotation properties we use literal object nodes if property range is in XSD namespace
-                                                    // and uri nodes otherwise.
-                                                    if (hf.propertyRange.ToString().Contains(XmlSpecsHelper.NamespaceXmlSchema))
-                                                    {
-                                                        objectNode = g.CreateLiteralNode(cellValue, hf.propertyRange);
-                                                    }
-                                                    else
-                                                    {
-                                                        objectNode = g.CreateUriNode(new Uri(exportNamespace.ToString() + cellValue));
-                                                    }
-                                                    break;
-                                                default:
-                                                    continue;
-                                            }
+                                            // This is a nested anonymous individual
 
-                                            g.Assert(new Triple(subjectNode, predicateNode, objectNode));
+                                            // Assert the intermediate (nested) individual
+                                            IUriNode predicateNode = hf.propertyIri;
+                                            IUriNode intermediateType = g.CreateUriNode(hf.propertyRange);
+                                            IBlankNode intermediateBlank = g.CreateBlankNode();
+                                            g.Assert(new Triple(subjectNode, predicateNode, intermediateBlank));
+                                            g.Assert(new Triple(intermediateBlank, rdfType, intermediateType));
+
+                                            IUriNode nestedPredicateNode = hf.nestedIri;
+
+                                            // Get out and parse object. 
+                                            // "Raw" cell value, will need treatment (TODO!)
+                                            INode objectNode;
+                                            string cellValue = dataCell.Text;
+
+                                            // Check so cell isn't empty
+                                            if (!cellValue.Equals(""))
+                                            {
+                                                switch (hf.nestedType.ToString())
+                                                {
+                                                    case OntologyHelper.OwlDatatypeProperty:
+                                                        objectNode = g.CreateLiteralNode(cellValue, hf.nestedRange);
+                                                        break;
+                                                    case OntologyHelper.OwlObjectProperty:
+                                                        objectNode = g.CreateUriNode(new Uri(exportNamespace.ToString() + cellValue));
+                                                        break;
+                                                    case OntologyHelper.OwlAnnotationProperty:
+                                                        // For annotation properties we use literal object nodes if property range is in XSD namespace
+                                                        // and uri nodes otherwise.
+                                                        if (hf.propertyRange.ToString().Contains(XmlSpecsHelper.NamespaceXmlSchema))
+                                                        {
+                                                            objectNode = g.CreateLiteralNode(cellValue, hf.nestedRange);
+                                                        }
+                                                        else
+                                                        {
+                                                            objectNode = g.CreateUriNode(new Uri(exportNamespace.ToString() + cellValue));
+                                                        }
+                                                        break;
+                                                    default:
+                                                        continue;
+                                                }
+
+                                                g.Assert(new Triple(intermediateBlank, nestedPredicateNode, objectNode));
+                                            }
+                                        }
+                                        else
+                                        {
+
+                                            IUriNode predicateNode = hf.propertyIri;
+
+                                            // Get out and parse object. 
+                                            // "Raw" cell value, will need treatment (TODO!)
+                                            INode objectNode;
+                                            string cellValue = dataCell.Text;
+
+                                            // Check so cell isn't empty
+                                            if (!cellValue.Equals(""))
+                                            {
+                                                switch (hf.propertyType.ToString())
+                                                {
+                                                    case OntologyHelper.OwlDatatypeProperty:
+                                                        objectNode = g.CreateLiteralNode(cellValue, hf.propertyRange);
+                                                        break;
+                                                    case OntologyHelper.OwlObjectProperty:
+                                                        objectNode = g.CreateUriNode(new Uri(exportNamespace.ToString() + cellValue));
+                                                        break;
+                                                    case OntologyHelper.OwlAnnotationProperty:
+                                                        // For annotation properties we use literal object nodes if property range is in XSD namespace
+                                                        // and uri nodes otherwise.
+                                                        if (hf.propertyRange.ToString().Contains(XmlSpecsHelper.NamespaceXmlSchema))
+                                                        {
+                                                            objectNode = g.CreateLiteralNode(cellValue, hf.propertyRange);
+                                                        }
+                                                        else
+                                                        {
+                                                            objectNode = g.CreateUriNode(new Uri(exportNamespace.ToString() + cellValue));
+                                                        }
+                                                        break;
+                                                    default:
+                                                        continue;
+                                                }
+
+                                                g.Assert(new Triple(subjectNode, predicateNode, objectNode));
+                                            }
                                         }
                                     }
                                 }
