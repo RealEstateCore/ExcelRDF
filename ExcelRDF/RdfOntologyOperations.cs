@@ -30,6 +30,11 @@ namespace ExcelRDF
         {
         }
 
+        private IEnumerable<string> Split(string str, int chunksize)
+        {
+            return Enumerable.Range(0, str.Length / chunksize)
+                .Select(i => str.Substring(i * chunksize, chunksize));
+        }
 
         private struct HeaderFields
         {
@@ -106,9 +111,9 @@ namespace ExcelRDF
                             int column = headerCell.Column;
 
                             // If there is an embedded note, proceed
-                            if (headerCell.NoteText().Count() > 0)
+                            if (headerCell.Comment != null)
                             {
-                                string noteText = headerCell.NoteText();
+                                string noteText = headerCell.Comment.Shape.TextFrame.Characters().Text;
                                 string[] noteTextComponents = noteText.Split('\n');
 
                                 string iriComponent = noteTextComponents[0];
@@ -150,8 +155,11 @@ namespace ExcelRDF
                                     string nestedTypeComponent = noteTextComponents[4];
                                     hf.nestedType = new Uri(nestedTypeComponent.Trim(trimUrisChars));
 
-                                    string nestedRangeComponent = noteTextComponents[5];
-                                    hf.nestedRange = new Uri(nestedRangeComponent.Trim(trimUrisChars));
+                                    string nestedRangeComponent = noteTextComponents[5].Trim(trimUrisChars);
+                                    if (nestedRangeComponent != "")
+                                    {
+                                        hf.nestedRange = new Uri(nestedRangeComponent.Trim(trimUrisChars));
+                                    }
 
                                     headerLookupTable[column] = hf;
                                 }
@@ -191,6 +199,8 @@ namespace ExcelRDF
 
                                         // Get header fields
                                         HeaderFields hf = headerLookupTable[dataCell.Column];
+
+                                        // TODO: handle the nested properties case
 
                                         // Check that there actually are header fields for the cell under consideration; otherwise, ignore cell
                                         // This is not a simple null check since HeaderFields is a struct, e.g., value type, which cannot be null
@@ -408,8 +418,7 @@ namespace ExcelRDF
                                             headerCellRange.Value = headerLabel;
 
                                             // Assign note text
-                                            // TODO: Split into multiple calls if length > 256 chars
-                                            headerCellRange.NoteText(noteText);
+                                            headerCellRange.AddComment(noteText);
                                             column++;
                                         }
                                         
@@ -447,8 +456,7 @@ namespace ExcelRDF
                                         }
 
                                         // Assign note text
-                                        // TODO: Split into multiple calls if length > 256 chars
-                                        headerCellRange.NoteText(noteText);
+                                        headerCellRange.AddComment(noteText);
                                         column++;
                                     }
                                 }
@@ -461,6 +469,8 @@ namespace ExcelRDF
                         }
                     }
                 }
+
+                
             }
         }
     }
