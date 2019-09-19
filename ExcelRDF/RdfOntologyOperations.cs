@@ -312,38 +312,20 @@ namespace ExcelRDF
 
                                     UriNode propertyAsUriNode = (UriNode)oProperty.Resource;
 
-
                                     // TODO: the below code is extremely repetitive. Sometime, when not sick and brain is working better,
                                     // Future Karl will refactor and simplify this (hopefully)
                                     if (nestedProperties.Keys.Contains(propertyAsUriNode.Uri))
                                     {
                                         foreach (Uri nestedPropertyUri in nestedProperties[propertyAsUriNode.Uri])
                                         {
-                                            OntologyProperty nestedProperty;
-                                            if (nestedPropertyUri.Equals(new Uri(OntologyHelper.PropertyLabel)))
-                                            {
-                                                // TODO this doesn't seem to work. Hard-code parameters for rdfs:label?
-                                                nestedProperty = g.CreateOntologyProperty(new Uri(OntologyHelper.PropertyLabel));
-                                            }
-                                            else {
-                                                nestedProperty = g.OwlProperties.Where(property => ((UriNode)property.Resource).Uri.Equals(nestedPropertyUri)).First();
-                                            }
-                                            
-                                            UriNode nestedPropertyAsUriNode = (UriNode)nestedProperty.Resource;
+                                            // Repeat header cell selection for each nested property
+                                            headerColumnName = Helper.GetExcelColumnName(column);
+                                            headerCellIdentifier = String.Format("{0}1", headerColumnName);
+                                            headerCellRange = newWorksheet.get_Range(headerCellIdentifier);
 
                                             // Find and assign label
-                                            string propertyLabel;
-                                            if (nestedProperty.Label.Count() > 0)
-                                            {
-                                                ILiteralNode labelNode = nestedProperty.Label.First();
-                                                propertyLabel = labelNode.Value;
-                                            }
-                                            else
-                                            {
-                                                propertyLabel = Helper.GetLocalName(nestedPropertyAsUriNode.Uri);
-                                            }
-                                            headerCellRange.Value = propertyLabel;
-
+                                            string headerLabel;
+                                           
                                             // Assign property IRI
                                             string noteText = String.Format("<{0}>", propertyAsUriNode.Uri.ToString());
 
@@ -361,39 +343,74 @@ namespace ExcelRDF
                                                 noteText += String.Format("\n<{0}>", rangeUri);
                                             }
 
-                                            // Nested property IRI
-                                            noteText += String.Format("\n<{0}>", nestedPropertyAsUriNode.Uri.ToString());
+                                            // Branching for special case of rdfs:label
+                                            if (nestedPropertyUri.ToString().Equals(OntologyHelper.PropertyLabel))
+                                            {
+                                                // Assign header label
+                                                headerLabel = "rdfs:label";
 
-                                            // Asign nested property type hinting
-                                            string nestedPropertyType;
-                                            if (nestedProperty.Types.Count() > 0)
-                                            {
-                                                nestedPropertyType = nestedProperty.Types.First().ToString();
-                                            }
-                                            else
-                                            {
-                                                nestedPropertyType = "";
-                                            }
-                                            noteText += String.Format("\n<{0}>", nestedPropertyType);
+                                                // Nested property IRI (i.e., rdfs:label)
+                                                noteText += String.Format("\n<{0}>", OntologyHelper.PropertyLabel);
 
-                                            // Nested range hinting IRI
-                                            OntologyClass[] namedNestedRanges = nestedProperty.Ranges.Where(o => o.Resource.NodeType == NodeType.Uri).ToArray();
-                                            string nestedRange;
-                                            if (namedNestedRanges.Count() > 0)
-                                            {
-                                                nestedRange = ((UriNode)namedNestedRanges.First().Resource).Uri.ToString();
+                                                // Nested property type
+                                                noteText += String.Format("\n<{0}>", OntologyHelper.OwlAnnotationProperty);
+
+                                                // Nested property range
+                                                noteText += String.Format("\n<{0}>", XmlSpecsHelper.XmlSchemaDataTypeString);
                                             }
-                                            else
-                                            {
-                                                nestedRange = "";
+                                            else {
+                                                // Get the property from the ontology
+                                                OntologyProperty nestedProperty = g.OwlProperties.Where(property => ((UriNode)property.Resource).Uri.Equals(nestedPropertyUri)).First();
+                                                UriNode nestedPropertyAsUriNode = (UriNode)nestedProperty.Resource;
+
+                                                // Assign header label
+                                                if (nestedProperty.Label.Count() > 0)
+                                                {
+                                                    ILiteralNode labelNode = nestedProperty.Label.First();
+                                                    headerLabel = labelNode.Value;
+                                                }
+                                                else
+                                                {
+                                                    headerLabel = Helper.GetLocalName(nestedPropertyAsUriNode.Uri);
+                                                }
+
+                                                // Nested property IRI
+                                                noteText += String.Format("\n<{0}>", nestedPropertyAsUriNode.Uri.ToString());
+
+                                                // Asign nested property type hinting
+                                                string nestedPropertyType;
+                                                if (nestedProperty.Types.Count() > 0)
+                                                {
+                                                    nestedPropertyType = nestedProperty.Types.First().ToString();
+                                                }
+                                                else
+                                                {
+                                                    nestedPropertyType = "";
+                                                }
+                                                noteText += String.Format("\n<{0}>", nestedPropertyType);
+
+                                                // Nested range hinting IRI
+                                                OntologyClass[] namedNestedRanges = nestedProperty.Ranges.Where(o => o.Resource.NodeType == NodeType.Uri).ToArray();
+                                                string nestedRange;
+                                                if (namedNestedRanges.Count() > 0)
+                                                {
+                                                    nestedRange = ((UriNode)namedNestedRanges.First().Resource).Uri.ToString();
+                                                }
+                                                else
+                                                {
+                                                    nestedRange = "";
+                                                }
+                                                noteText += String.Format("\n<{0}>", nestedRange);
                                             }
-                                            noteText += String.Format("\n<{0}>", nestedRange);
-                                            
+
+                                            // Assign header label
+                                            headerLabel = headerLabel + " (through nested property " + Helper.GetLocalName(propertyAsUriNode.Uri) + ")";
+                                            headerCellRange.Value = headerLabel;
+
                                             // Assign note text
                                             // TODO: Split into multiple calls if length > 256 chars
                                             headerCellRange.NoteText(noteText);
                                             column++;
-
                                         }
                                         
                                     }
