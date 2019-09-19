@@ -36,6 +36,9 @@ namespace ExcelRDF
             public IUriNode propertyIri;
             public Uri propertyType;
             public Uri propertyRange;
+            public IUriNode nestedIri;
+            public Uri nestedType;
+            public Uri nestedRange;
         }
 
         /// <summary>
@@ -127,7 +130,29 @@ namespace ExcelRDF
                                     
                                     string propertyRangeComponent = noteTextComponents[2];
                                     hf.propertyRange = new Uri(propertyRangeComponent.Trim(trimUrisChars));
-                                    
+
+                                    headerLookupTable[column] = hf;
+                                }
+                                else if (noteTextComponents.Count() == 6)
+                                {
+                                    HeaderFields hf = new HeaderFields();
+                                    hf.propertyIri = g.CreateUriNode(UriFactory.Create(iriComponent.Trim(trimUrisChars)));
+
+                                    string propertyTypeComponent = noteTextComponents[1];
+                                    hf.propertyType = new Uri(propertyTypeComponent.Trim(trimUrisChars));
+
+                                    string propertyRangeComponent = noteTextComponents[2];
+                                    hf.propertyRange = new Uri(propertyRangeComponent.Trim(trimUrisChars));
+
+                                    string nestedIriComponent = noteTextComponents[3];
+                                    hf.nestedIri = g.CreateUriNode(UriFactory.Create(nestedIriComponent.Trim(trimUrisChars)));
+
+                                    string nestedTypeComponent = noteTextComponents[4];
+                                    hf.nestedType = new Uri(nestedTypeComponent.Trim(trimUrisChars));
+
+                                    string nestedRangeComponent = noteTextComponents[5];
+                                    hf.nestedRange = new Uri(nestedRangeComponent.Trim(trimUrisChars));
+
                                     headerLookupTable[column] = hf;
                                 }
                             }
@@ -278,7 +303,6 @@ namespace ExcelRDF
                             {
                                 if (oProperty.Resource.NodeType == NodeType.Uri && resourcesToImport.Contains(oProperty.ToString()))
                                 {
-                                    UriNode propertyAsUriNode = (UriNode)oProperty.Resource;
 
                                     // This is because Excel uses strange adressing, i.e., "A1" instead of something 
                                     // numeric and zero-indexed such as "0,0".
@@ -286,39 +310,130 @@ namespace ExcelRDF
                                     string headerCellIdentifier = String.Format("{0}1", headerColumnName);
                                     Range headerCellRange = newWorksheet.get_Range(headerCellIdentifier);
 
-                                    // Find and assign label
-                                    string propertyLabel;
-                                    if (oProperty.Label.Count() > 0)
+                                    UriNode propertyAsUriNode = (UriNode)oProperty.Resource;
+
+
+                                    // TODO: the below code is extremely repetitive. Sometime, when not sick and brain is working better,
+                                    // Future Karl will refactor and simplify this (hopefully)
+                                    if (nestedProperties.Keys.Contains(propertyAsUriNode.Uri))
                                     {
-                                        ILiteralNode labelNode = oProperty.Label.First();
-                                        propertyLabel = labelNode.Value;
+                                        foreach (Uri nestedPropertyUri in nestedProperties[propertyAsUriNode.Uri])
+                                        {
+                                            OntologyProperty nestedProperty;
+                                            if (nestedPropertyUri.Equals(new Uri(OntologyHelper.PropertyLabel)))
+                                            {
+                                                // TODO this doesn't seem to work. Hard-code parameters for rdfs:label?
+                                                nestedProperty = g.CreateOntologyProperty(new Uri(OntologyHelper.PropertyLabel));
+                                            }
+                                            else {
+                                                nestedProperty = g.OwlProperties.Where(property => ((UriNode)property.Resource).Uri.Equals(nestedPropertyUri)).First();
+                                            }
+                                            
+                                            UriNode nestedPropertyAsUriNode = (UriNode)nestedProperty.Resource;
+
+                                            // Find and assign label
+                                            string propertyLabel;
+                                            if (nestedProperty.Label.Count() > 0)
+                                            {
+                                                ILiteralNode labelNode = nestedProperty.Label.First();
+                                                propertyLabel = labelNode.Value;
+                                            }
+                                            else
+                                            {
+                                                propertyLabel = Helper.GetLocalName(nestedPropertyAsUriNode.Uri);
+                                            }
+                                            headerCellRange.Value = propertyLabel;
+
+                                            // Assign property IRI
+                                            string noteText = String.Format("<{0}>", propertyAsUriNode.Uri.ToString());
+
+                                            // Asign property type hinting
+                                            string propertyType = oProperty.Types.First().ToString();
+                                            noteText += String.Format("\n<{0}>", propertyType);
+
+                                            // Assign range hinting IRI
+                                            // TODO: what if no range exists? see same case below and after else clause
+                                            OntologyClass[] namedRanges = oProperty.Ranges.Where(o => o.Resource.NodeType == NodeType.Uri).ToArray();
+                                            if (namedRanges.Count() > 0)
+                                            {
+                                                UriNode rangeAsUriNode = (UriNode)namedRanges.First().Resource;
+                                                string rangeUri = rangeAsUriNode.Uri.ToString();
+                                                noteText += String.Format("\n<{0}>", rangeUri);
+                                            }
+
+                                            // Nested property IRI
+                                            noteText += String.Format("\n<{0}>", nestedPropertyAsUriNode.Uri.ToString());
+
+                                            // Asign nested property type hinting
+                                            string nestedPropertyType;
+                                            if (nestedProperty.Types.Count() > 0)
+                                            {
+                                                nestedPropertyType = nestedProperty.Types.First().ToString();
+                                            }
+                                            else
+                                            {
+                                                nestedPropertyType = "";
+                                            }
+                                            noteText += String.Format("\n<{0}>", nestedPropertyType);
+
+                                            // Nested range hinting IRI
+                                            OntologyClass[] namedNestedRanges = nestedProperty.Ranges.Where(o => o.Resource.NodeType == NodeType.Uri).ToArray();
+                                            string nestedRange;
+                                            if (namedNestedRanges.Count() > 0)
+                                            {
+                                                nestedRange = ((UriNode)namedNestedRanges.First().Resource).Uri.ToString();
+                                            }
+                                            else
+                                            {
+                                                nestedRange = "";
+                                            }
+                                            noteText += String.Format("\n<{0}>", nestedRange);
+                                            
+                                            // Assign note text
+                                            // TODO: Split into multiple calls if length > 256 chars
+                                            headerCellRange.NoteText(noteText);
+                                            column++;
+
+                                        }
+                                        
                                     }
-                                    else
-                                    {
-                                        propertyLabel = Helper.GetLocalName(propertyAsUriNode.Uri);
+                                    else {
+
+
+                                        // Find and assign label
+                                        string propertyLabel;
+                                        if (oProperty.Label.Count() > 0)
+                                        {
+                                            ILiteralNode labelNode = oProperty.Label.First();
+                                            propertyLabel = labelNode.Value;
+                                        }
+                                        else
+                                        {
+                                            propertyLabel = Helper.GetLocalName(propertyAsUriNode.Uri);
+                                        }
+                                        headerCellRange.Value = propertyLabel;
+
+                                        // Assign property IRI
+                                        string noteText = String.Format("<{0}>", propertyAsUriNode.Uri.ToString());
+
+                                        // Asign property type hinting
+                                        string propertyType = oProperty.Types.First().ToString();
+                                        noteText += String.Format("\n<{0}>", propertyType);
+
+                                        // Assign range hinting IRI (provided simple )
+                                        OntologyClass[] namedRanges = oProperty.Ranges.Where(o => o.Resource.NodeType == NodeType.Uri).ToArray();
+                                        if (namedRanges.Count() > 0)
+                                        {
+                                            UriNode rangeAsUriNode = (UriNode)namedRanges.First().Resource;
+                                            string rangeUri = rangeAsUriNode.Uri.ToString();
+                                            noteText += String.Format("\n<{0}>", rangeUri);
+                                        }
+
+                                        // Assign note text
+                                        // TODO: Split into multiple calls if length > 256 chars
+                                        headerCellRange.NoteText(noteText);
+                                        column++;
                                     }
-                                    headerCellRange.Value = propertyLabel;
-
-                                    // Assign property IRI
-                                    string noteText = String.Format("<{0}>", propertyAsUriNode.Uri.ToString());
-
-                                    // Asign property type hinting
-                                    string propertyType = oProperty.Types.First().ToString();
-                                    noteText += String.Format("\n<{0}>", propertyType);
-
-                                    // Assign range hinting IRI (provided simple )
-                                    OntologyClass[] namedRanges = oProperty.Ranges.Where(o => o.Resource.NodeType == NodeType.Uri).ToArray();
-                                    if (namedRanges.Count() > 0)
-                                    {
-                                        UriNode rangeAsUriNode = (UriNode)namedRanges.First().Resource;
-                                        string rangeUri = rangeAsUriNode.Uri.ToString();
-                                        noteText += String.Format("\n<{0}>", rangeUri);
-                                    }
-
-                                    // Assign note text
-                                    // TODO: Split into multiple calls if length > 256 chars
-                                    headerCellRange.NoteText(noteText);
-                                    column++;
                                 }
                             }
 
