@@ -113,7 +113,8 @@ namespace ExcelRDF
                             // If there is an embedded note, proceed
                             if (headerCell.Comment != null)
                             {
-                                string noteText = headerCell.Comment.Shape.TextFrame.Characters().Text;
+                                string noteText = headerCell.Comment.Text(Type.Missing, Type.Missing, Type.Missing);
+                                MessageBox.Show(noteText);
                                 string[] noteTextComponents = noteText.Split('\n');
 
                                 string iriComponent = noteTextComponents[0];
@@ -156,9 +157,9 @@ namespace ExcelRDF
                                     hf.nestedType = new Uri(nestedTypeComponent.Trim(trimUrisChars));
 
                                     string nestedRangeComponent = noteTextComponents[5].Trim(trimUrisChars);
-                                    if (nestedRangeComponent != "")
+                                    if (nestedRangeComponent.Length > 0)
                                     {
-                                        hf.nestedRange = new Uri(nestedRangeComponent.Trim(trimUrisChars));
+                                        hf.nestedRange = new Uri(nestedRangeComponent);
                                     }
 
                                     headerLookupTable[column] = hf;
@@ -212,8 +213,16 @@ namespace ExcelRDF
 
                                             // Assert the intermediate (nested) individual
                                             IUriNode predicateNode = hf.propertyIri;
+                                            INode intermediateBlank;
+                                            if (g.GetTriplesWithSubjectPredicate(subjectNode, predicateNode).Count() > 0)
+                                            {
+                                                intermediateBlank = g.GetTriplesWithSubjectPredicate(subjectNode, predicateNode).First().Object;
+                                            }
+                                            else
+                                            {
+                                                intermediateBlank = g.CreateBlankNode();
+                                            }
                                             IUriNode intermediateType = g.CreateUriNode(hf.propertyRange);
-                                            IBlankNode intermediateBlank = g.CreateBlankNode();
                                             g.Assert(new Triple(subjectNode, predicateNode, intermediateBlank));
                                             g.Assert(new Triple(intermediateBlank, rdfType, intermediateType));
 
@@ -238,7 +247,7 @@ namespace ExcelRDF
                                                     case OntologyHelper.OwlAnnotationProperty:
                                                         // For annotation properties we use literal object nodes if property range is in XSD namespace
                                                         // and uri nodes otherwise.
-                                                        if (hf.propertyRange.ToString().Contains(XmlSpecsHelper.NamespaceXmlSchema))
+                                                        if (hf.nestedRange.ToString().Contains(XmlSpecsHelper.NamespaceXmlSchema))
                                                         {
                                                             objectNode = g.CreateLiteralNode(cellValue, hf.nestedRange);
                                                         }
@@ -464,7 +473,7 @@ namespace ExcelRDF
                                             }
 
                                             // Assign header label
-                                            headerLabel = headerLabel + " (through nested property " + Helper.GetLocalName(propertyAsUriNode.Uri) + ")";
+                                            headerLabel = headerLabel + " (through " + Helper.GetLocalName(propertyAsUriNode.Uri) + ")";
                                             headerCellRange.Value = headerLabel;
 
                                             // Assign note text
