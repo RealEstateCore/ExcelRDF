@@ -114,7 +114,6 @@ namespace ExcelRDF
                             if (headerCell.Comment != null)
                             {
                                 string noteText = headerCell.Comment.Text(Type.Missing, Type.Missing, Type.Missing);
-                                MessageBox.Show(noteText);
                                 string[] noteTextComponents = noteText.Split('\n');
 
                                 string iriComponent = noteTextComponents[0];
@@ -183,6 +182,9 @@ namespace ExcelRDF
                                 string identifierCellIdentifier = String.Format("{0}{1}", Helper.GetExcelColumnName(identifierColumn), rowIndex);
                                 Range identifierCell = worksheet.get_Range(identifierCellIdentifier);
 
+                                // Used to store the references to any intermediate (nested) blank nodes for the row
+                                Dictionary<IUriNode, IBlankNode> intermediateNodes = new Dictionary<IUriNode, IBlankNode>();
+
                                 // Only parse rows that have an identifier
                                 if (identifierCell.Text != "")
                                 {
@@ -213,14 +215,15 @@ namespace ExcelRDF
 
                                             // Assert the intermediate (nested) individual
                                             IUriNode predicateNode = hf.propertyIri;
-                                            INode intermediateBlank;
-                                            if (g.GetTriplesWithSubjectPredicate(subjectNode, predicateNode).Count() > 0)
+                                            IBlankNode intermediateBlank;
+                                            if (intermediateNodes.ContainsKey(predicateNode))
                                             {
-                                                intermediateBlank = g.GetTriplesWithSubjectPredicate(subjectNode, predicateNode).First().Object;
+                                                intermediateBlank = intermediateNodes[predicateNode];
                                             }
                                             else
                                             {
                                                 intermediateBlank = g.CreateBlankNode();
+                                                intermediateNodes.Add(predicateNode, intermediateBlank);
                                             }
                                             IUriNode intermediateType = g.CreateUriNode(hf.propertyRange);
                                             g.Assert(new Triple(subjectNode, predicateNode, intermediateBlank));
