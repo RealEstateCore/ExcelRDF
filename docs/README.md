@@ -51,6 +51,20 @@ When exporting such an Excel skeleton to RDF (whether created wholly in this plu
 
 <img src="images/ExportRdfDialog.png" style="border: 1px solid black; margin-left: 20%; width: 75%;" />
 
+### Nested individuals
+
+Occasionally you may have poorly normalized data in which several columns in the Excel sheet have some shared characteristics that would make them suitable for representation as an own individual in the generated RDF graph. For instance, as shown in the figure below, you may have a table called *Staff Members*, containing some columns indicating the starting date of a particular staff member, and their job title -- data which, in the generated graph, you would want to split out into a separate node of the type *Employment*, connected to your staff member instances via an object property.
+
+<img src="images/NestedIndividualsData.png" style="border: 1px solid black; margin-left: 20%; width: 75%;" />
+
+ExcelRDF allows you to generate skeletons from your ontology that adhere to such a denormalized structure; and to parse any data expressed in accordance with the skeleton, back into RDF graphs. In order to do this, when importing the ontology as described above, right-click on a property that you have selected for inclusion in the generated skeleton. This brings up a menu (see figure below) from which you can set the property range to be either a named individual or a nested anonymous individual. In the former case (which is the default), ExcelRDF will create only one column for this property, and will when exporting an RDF graph treat the content of this column as RDF literals or IRIs (depending on the type of property).
+
+<img src="images/NestedIndividualsDropDown.png" style="border: 1px solid black; margin-left: 20%; width: 75%;" />
+
+In the latter case however, ExcelRDF will create a number of columns (depending on what you select in the *Anonymous Individual Properties* sub-menu, see figure below), and the software will at export time treat the content of all of these columns as properties on a new anonymous individual, connected to the original individual via the initially selected property.
+
+<img src="images/AnonymousIndividualProperties.png" style="border: 1px solid black; margin-left: 20%; width: 75%;" />
+
 ## Acknowledgements
 
 This plugin reuses [dotNetRDF](http://www.dotnetrdf.org/), a freely (MIT) licensed and very useful library for RDF/ontology parsing, managing, querying, etc. in .NET environments.
