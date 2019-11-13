@@ -33,8 +33,8 @@
     <PublishUrl>C:\Users\karlh\Scratch\Git\ExcelRDF\docs\distribution\</PublishUrl>
     <InstallUrl>https://karlhammar.com/ExcelRDF/distribution/</InstallUrl>
     <TargetCulture>en</TargetCulture>
-    <ApplicationVersion>1.0.0.1</ApplicationVersion>
-    <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
+    <ApplicationVersion>1.1.0.0</ApplicationVersion>
+    <AutoIncrementApplicationRevision>false</AutoIncrementApplicationRevision>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateInterval>7</UpdateInterval>
     <UpdateIntervalUnits>days</UpdateIntervalUnits>
@@ -272,7 +272,7 @@
     </ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>710B53DA51F3304F01783A47E9909A5016358719</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>6F62947135BD456D1A27AC27B2B11C150013E0F1</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
