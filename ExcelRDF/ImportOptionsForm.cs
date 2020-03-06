@@ -48,7 +48,7 @@ namespace ExcelRDF
             }
             
             // Recurse for all children
-            foreach (OntologyClass sc in c.DirectSubClasses)
+            foreach (OntologyClass sc in c.DirectSubClasses.Where(subClass => subClass.IsNamed()))
             {
                 AddToTreeView(sc, newNode.Nodes);
             }
@@ -61,9 +61,10 @@ namespace ExcelRDF
         private void InitializeTreeView()
         {
             ontologyClassesTreeView.BeginUpdate();
+
             foreach (OntologyClass c in graph.OwlClasses)
             {
-                if (c.IsTopClass)
+                if (c.IsTopNamedClass())
                 {
                     AddToTreeView(c, ontologyClassesTreeView.Nodes);
                 }

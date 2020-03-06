@@ -194,6 +194,7 @@
     can be found.
   -->
   <ItemGroup>
+    <Compile Include="DotNetRdfExtensions.cs" />
     <Compile Include="ExportOptionsForm.cs">
       <SubType>Form</SubType>
     </Compile>
