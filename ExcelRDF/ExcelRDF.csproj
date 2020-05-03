@@ -31,9 +31,9 @@
     <IsWebBootstrapper>True</IsWebBootstrapper>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <PublishUrl>C:\Users\karlh\Scratch\Git\ExcelRDF\docs\distribution\</PublishUrl>
-    <InstallUrl>https://karlhammar.com/ExcelRDF/distribution/</InstallUrl>
+    <InstallUrl>https://dev.realestatecore.io/ExcelRDF/distribution/</InstallUrl>
     <TargetCulture>en</TargetCulture>
-    <ApplicationVersion>1.1.1.0</ApplicationVersion>
+    <ApplicationVersion>1.1.2.0</ApplicationVersion>
     <AutoIncrementApplicationRevision>false</AutoIncrementApplicationRevision>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateInterval>7</UpdateInterval>
