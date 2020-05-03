@@ -16,7 +16,7 @@ When exporting such an Excel skeleton to RDF (whether created wholly in this plu
 
 *Note:* Due to the lack of a code-signing certificate, a previous build of this plugin required users to add this website to their Trusted Sites list in the Windows Control Panel. I have now obtained such a certificate and signed the 1.0 build using it, so that procedure is no longer necessary. If you added this site to your Trusted Sites list, you can probably remove it now.
 
-1. Download and execute setup.exe from the [releases page](https://github.com/hammar/ExcelRDF/releases).
+1. Download and execute setup.exe from the [releases page](https://github.com/RealEstateCore/ExcelRDF/releases).
 2. The Windows 10 SmartScreen filter may try to prevent launching the file. If so, override it by selecting **More information** and **Run anyway**.
 3. Subsequently the prerequisite .NET Framework versions will be installed (which will require superuser credentials), and the VSTO plugin itself will then be installed. You may in the latter phase be asked about if you trust the issuer who signed the software. Indicate that you do, and continue installing.
 4. Launch Excel and see the instructions given below.
