@@ -152,12 +152,12 @@ namespace ExcelRDF
             if (selectedOption.Equals(NESTED_ANON_INDIVIDUAL_LABEL))
             {
                 propCtxMenuSubProperties.Enabled = true;
-                RdfOntologyOperations.instance.nestedProperties[selectedPropertyUri] = new HashSet<Uri>();
+                RdfOntologyOperations.instance.nestedProperties[selectedPropertyUri.AbsoluteUri] = new HashSet<string>();
             }
             else
             {
                 propCtxMenuSubProperties.Enabled = false;
-                RdfOntologyOperations.instance.nestedProperties.Remove(selectedPropertyUri);
+                RdfOntologyOperations.instance.nestedProperties.Remove(selectedPropertyUri.AbsoluteUri);
             }
         }
 
@@ -172,7 +172,7 @@ namespace ExcelRDF
                 NESTED_ANON_INDIVIDUAL_LABEL });
 
             _noise = true;
-            if (!RdfOntologyOperations.instance.nestedProperties.ContainsKey(selectedPropertyUri)) {
+            if (!RdfOntologyOperations.instance.nestedProperties.ContainsKey(selectedPropertyUri.AbsoluteUri)) {
                 propCtxMenuRangeTypeSelector.SelectedIndex = 0;
                 propCtxMenuSubProperties.Enabled = false;
             }
@@ -202,8 +202,6 @@ namespace ExcelRDF
             }
             foreach (Uri subPropertyUri in subPropertyUris)
             {
-
-
                 ToolStripMenuItem newItem = new ToolStripMenuItem(subPropertyUri.ToString())
                 {
                     Checked = false,
@@ -213,9 +211,9 @@ namespace ExcelRDF
                 newItem.CheckedChanged += new EventHandler(this.NestedProperty_CheckedChanged);
                 propCtxMenuSubProperties.DropDownItems.Add(newItem);
 
-                if (RdfOntologyOperations.instance.nestedProperties.ContainsKey(selectedPropertyUri)) {
-                    HashSet<Uri> nestedProperties = RdfOntologyOperations.instance.nestedProperties[selectedPropertyUri];
-                    if (nestedProperties.Contains(subPropertyUri))
+                if (RdfOntologyOperations.instance.nestedProperties.ContainsKey(selectedPropertyUri.AbsoluteUri)) {
+                    HashSet<string> nestedProperties = RdfOntologyOperations.instance.nestedProperties[selectedPropertyUri.AbsoluteUri];
+                    if (nestedProperties.Contains(subPropertyUri.AbsoluteUri))
                     {
                         newItem.Checked = true;
                     }
@@ -234,11 +232,11 @@ namespace ExcelRDF
             Uri nestedPropertyUri = (Uri)((ToolStripMenuItem)sender).Tag;
             if (((ToolStripMenuItem)sender).Checked)
             {
-                RdfOntologyOperations.instance.nestedProperties[selectedPropertyUri].Add(nestedPropertyUri);
+                RdfOntologyOperations.instance.nestedProperties[selectedPropertyUri.AbsoluteUri].Add(nestedPropertyUri.AbsoluteUri);
             }
             else
             {
-                RdfOntologyOperations.instance.nestedProperties[selectedPropertyUri].Remove(nestedPropertyUri);
+                RdfOntologyOperations.instance.nestedProperties[selectedPropertyUri.AbsoluteUri].Remove(nestedPropertyUri.AbsoluteUri);
             }
         }
     }

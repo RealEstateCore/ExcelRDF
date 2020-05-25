@@ -18,7 +18,8 @@ namespace ExcelRDF
         public HashSet<Uri> candidateNamespacesToMap;
         public Dictionary<string, Uri> exportPrefixMappings;
         public HashSet<string> resourcesToImport = new HashSet<string>();
-        public Dictionary<Uri, HashSet<Uri>> nestedProperties = new Dictionary<Uri, HashSet<Uri>>();
+        // Using string representations below since .NET Uri class equals() doesn't take fragment into account :-(
+        public Dictionary<string, HashSet<string>> nestedProperties = new Dictionary<string, HashSet<string>>();
 
         // Explicit static constructor to tell C# compiler
         // not to mark type as beforefieldinit
@@ -386,9 +387,9 @@ namespace ExcelRDF
 
                                     // TODO: the below code is extremely repetitive. Sometime, when not sick and brain is working better,
                                     // Future Karl will refactor and simplify this (hopefully)
-                                    if (nestedProperties.Keys.Contains(propertyAsUriNode.Uri))
+                                    if (nestedProperties.Keys.Contains(propertyAsUriNode.Uri.AbsoluteUri))
                                     {
-                                        foreach (Uri nestedPropertyUri in nestedProperties[propertyAsUriNode.Uri])
+                                        foreach (string nestedPropertyUri in nestedProperties[propertyAsUriNode.Uri.AbsoluteUri])
                                         {
                                             // Repeat header cell selection for each nested property
                                             headerColumnName = Helper.GetExcelColumnName(column);
@@ -416,7 +417,7 @@ namespace ExcelRDF
                                             }
 
                                             // Branching for special case of rdfs:label
-                                            if (nestedPropertyUri.ToString().Equals(OntologyHelper.PropertyLabel))
+                                            if (nestedPropertyUri.Equals(OntologyHelper.PropertyLabel))
                                             {
                                                 // Assign header label
                                                 headerLabel = "rdfs:label";
@@ -432,7 +433,7 @@ namespace ExcelRDF
                                             }
                                             else {
                                                 // Get the property from the ontology
-                                                OntologyProperty nestedProperty = g.OwlProperties.Where(property => ((UriNode)property.Resource).Uri.Equals(nestedPropertyUri)).First();
+                                                OntologyProperty nestedProperty = g.OwlProperties.Where(property => ((UriNode)property.Resource).Uri.AbsoluteUri.Equals(nestedPropertyUri)).First();
                                                 UriNode nestedPropertyAsUriNode = (UriNode)nestedProperty.Resource;
 
                                                 // Assign header label
@@ -485,9 +486,8 @@ namespace ExcelRDF
                                         }
                                         
                                     }
-                                    else {
-
-
+                                    else 
+                                    {
                                         // Find and assign label
                                         string propertyLabel;
                                         if (oProperty.Label.Count() > 0)
