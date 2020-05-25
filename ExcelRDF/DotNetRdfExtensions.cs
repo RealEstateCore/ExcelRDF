@@ -12,7 +12,7 @@ namespace ExcelRDF
     {
         public static bool IsTopNamedClass(this OntologyClass cls)
         {
-            return cls.IsNamed() && !cls.SuperClasses.Any(superCls => superCls.IsNamed());
+            return cls.IsNamed() && !cls.DirectSuperClasses.Any(superCls => superCls.IsNamed() && !superCls.Resource.ToString().Equals("http://www.w3.org/2002/07/owl#Thing"));
         }
 
         public static bool IsNamed(this OntologyResource ontResource)
