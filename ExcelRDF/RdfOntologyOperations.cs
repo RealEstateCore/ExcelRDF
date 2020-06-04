@@ -246,7 +246,15 @@ namespace ExcelRDF
                                                         objectNode = g.CreateLiteralNode(cellValue, hf.nestedRange);
                                                         break;
                                                     case OntologyHelper.OwlObjectProperty:
-                                                        objectNode = g.CreateUriNode(new Uri(exportNamespace.ToString() + cellValue));
+                                                        // If there is a valid URI in the cell, use that as-is, otherwise generate one frame the export namespace
+                                                        if (Uri.TryCreate(cellValue, UriKind.Absolute, out Uri tempObjectPropertyValue) == true)
+                                                        {
+                                                            objectNode = g.CreateUriNode(tempObjectPropertyValue);
+                                                        }
+                                                        else
+                                                        {
+                                                            objectNode = g.CreateUriNode(new Uri(exportNamespace.ToString() + cellValue));
+                                                        }
                                                         break;
                                                     case OntologyHelper.OwlAnnotationProperty:
                                                         // For annotation properties we use literal object nodes if property range is in XSD namespace
@@ -257,7 +265,15 @@ namespace ExcelRDF
                                                         }
                                                         else
                                                         {
-                                                            objectNode = g.CreateUriNode(new Uri(exportNamespace.ToString() + cellValue));
+                                                            // If there is a valid URI in the cell, use that as-is, otherwise generate one frame the export namespace
+                                                            if (Uri.TryCreate(cellValue, UriKind.Absolute, out Uri tempAnnotationPropertyValue) == true)
+                                                            {
+                                                                objectNode = g.CreateUriNode(tempAnnotationPropertyValue);
+                                                            }
+                                                            else
+                                                            {
+                                                                objectNode = g.CreateUriNode(new Uri(exportNamespace.ToString() + cellValue));
+                                                            }
                                                         }
                                                         break;
                                                     default:
@@ -286,7 +302,15 @@ namespace ExcelRDF
                                                         objectNode = g.CreateLiteralNode(cellValue, hf.propertyRange);
                                                         break;
                                                     case OntologyHelper.OwlObjectProperty:
-                                                        objectNode = g.CreateUriNode(new Uri(exportNamespace.ToString() + cellValue));
+                                                        // If there is a valid URI in the cell, use that as-is, otherwise generate one frame the export namespace
+                                                        if (Uri.TryCreate(cellValue, UriKind.Absolute, out Uri tempObjectPropertyValue) == true)
+                                                        {
+                                                            objectNode = g.CreateUriNode(tempObjectPropertyValue);
+                                                        }
+                                                        else
+                                                        {
+                                                            objectNode = g.CreateUriNode(new Uri(exportNamespace.ToString() + cellValue));
+                                                        }
                                                         break;
                                                     case OntologyHelper.OwlAnnotationProperty:
                                                         // For annotation properties we use literal object nodes if property range is in XSD namespace
@@ -297,7 +321,15 @@ namespace ExcelRDF
                                                         }
                                                         else
                                                         {
-                                                            objectNode = g.CreateUriNode(new Uri(exportNamespace.ToString() + cellValue));
+                                                            // If there is a valid URI in the cell, use that as-is, otherwise generate one frame the export namespace
+                                                            if (Uri.TryCreate(cellValue, UriKind.Absolute, out Uri tempAnnotationPropertyValue) == true)
+                                                            {
+                                                                objectNode = g.CreateUriNode(tempAnnotationPropertyValue);
+                                                            }
+                                                            else
+                                                            {
+                                                                objectNode = g.CreateUriNode(new Uri(exportNamespace.ToString() + cellValue));
+                                                            }
                                                         }
                                                         break;
                                                     default:
