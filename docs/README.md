@@ -1,5 +1,7 @@
 # ExcelRDF Documentation
 
+**Disclaimer:** This software is a four year old research prototype. It may have issues. Unfortunately, I do not have the bandwidth to prioritize developing it at the moment. You are most welcome to find and fix such issues through pull requests. The repository remains live here in case any other active RealEstateCore devs or community members wish to pick up the reins and continue development. /Karl Hammar, author
+
 ## Functionality
 
 The purpose of this VSTO plugin is to provide light-weight translation from OWL to XLS, and from XLS to RDF, to enable linked data generation from existing Excel-based tools and workflows.
